@@ -1,0 +1,16 @@
+{
+  "name": "flowtrack/supplier-portal",
+  "description": "Isolated supplier-facing Laravel service. No FlowTracker database or filesystem access.",
+  "type": "project",
+  "require": {"php":"^8.3", "laravel/framework":"^13.8"},
+  "require-dev": {
+    "mockery/mockery": "^1.6",
+    "nunomaduro/collision": "^8.6",
+    "phpunit/phpunit": "^12.5"
+  },
+  "autoload": {"psr-4": {"App\\":"app/"}},
+  "autoload-dev": {"psr-4": {"Tests\\":"tests/"}},
+  "scripts": {"post-autoload-dump":["Illuminate\\Foundation\\ComposerScripts::postAutoloadDump", "@php artisan package:discover --ansi"]},
+  "minimum-stability":"stable", "prefer-stable":true,
+  "config":{"optimize-autoloader":true, "sort-packages":true}
+}

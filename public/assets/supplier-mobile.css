@@ -1,0 +1,258 @@
+/* Supplier Portal mobile / tablet only. Desktop styling and workflows stay intact. */
+.supplier-mobile-backdrop { display:none; }
+@media (max-width: 1024px) {
+  #portalView, #supplierOrderView { min-width: 0; max-width: 100%; }
+  #portalView :is(.main,.content,.app-view,.card,.table-card,.quote-shell,.quote-layout,.quote-main-column,.module-grid,.supplier-prototype-content,.supplier-prototype-primary-column,.supplier-prototype-secondary-column) { min-width: 0; }
+  #portalView :is(img,svg) { max-width: 100%; }
+  #portalView :is(.page-header,.card-header,.quote-titlebar,.supplier-prototype-header) { min-width: 0; }
+  #portalView :is(h1,h2,h3,.item-title,.supplier-prototype-product-cell strong) { overflow-wrap: anywhere; }
+  #portalView :is(.table-scroll,.pricing-table-scroll,.pricing-tier-scroll,.supplier-prototype-table-wrap,.supplier-flow-table-scroll,.upload-table-wrap) { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  #portalView :is(input,select,textarea) { max-width: 100%; }
+  #portalView .table-card, #portalView .pricing-table-card { max-width:100%; }
+  #portalView :is(.quote-layout,.detail-layout,.dashboard-grid,.module-grid) { grid-template-columns: minmax(0,1fr); }
+  #portalView :is(.quote-sidebar,.summary-card) { position:static; }
+  /* An ID-qualified desktop rule otherwise keeps the order sidebar as a second column. */
+  #supplierOrderView .supplier-prototype-grid { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-primary-column, #supplierOrderView .supplier-prototype-secondary-column { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-primary-column > *, #supplierOrderView .supplier-prototype-secondary-column > * { min-width:0; }
+}
+@media (max-width: 900px) {
+  /* Mobile navigation overlays content; never reserve an invisible sidebar column. */
+  #portalView .shell { grid-template-columns:minmax(0,1fr); }
+  #portalView .mobile-menu { display:inline-flex; }
+  #portalView .sidebar { position:fixed; top:62px; left:0; bottom:0; height:auto; transform:translateX(-101%); z-index: 71; width:min(290px,calc(100vw - 52px)); max-width:100%; box-shadow: 0 10px 35px rgba(9,25,48,.18); }
+  #portalView .sidebar.open { transform:translateX(0); }
+  .supplier-mobile-backdrop { display:block; position:fixed; inset:62px 0 0; z-index:70; background:rgba(13,30,52,.46); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease,visibility .18s; }
+  #portalView .sidebar.open + .supplier-mobile-backdrop { opacity:1; visibility:visible; pointer-events:auto; }
+  body.supplier-mobile-nav-open { overflow:hidden; }
+  #portalView .topbar { padding-inline:12px; }
+  #portalView .topbar-left, #portalView .topbar-right { min-width:0; gap:8px; }
+  #portalView .topbar .brand { min-width:0; max-width:min(42vw,240px); }
+  #portalView .topbar .brand :is(img,svg) { max-height:38px; width:auto; }
+  #portalView .mobile-menu { width:44px; height:44px; min-width:44px; display:inline-flex; justify-content:center; align-items:center; }
+  #portalView :is(.notification-btn,.account>.icon-button) { width:42px; min-width:42px; height:42px; display:inline-grid; place-items:center; }
+  #portalView .account { gap:5px; }
+  #portalView .account .avatar { flex:none; }
+  #portalView .main { max-width:100%; }
+  #supplierOrderView .supplier-prototype-main { padding:18px 16px 30px; }
+}
+@media (max-width: 760px) {
+  #portalView .main { padding:16px 12px 32px; }
+  #portalView :is(input,select,textarea) { font-size:16px; }
+  #supplierOrderView .supplier-flow-dialog .supplier-flow-action-form :is(input,select,textarea) { font-size:16px; }
+  #portalView .page-header { gap:10px; margin-bottom:16px; }
+  #portalView .page-header h1 { font-size:clamp(20px,5.7vw,25px); line-height:1.24; }
+  #portalView :is(.card-header,.supplier-prototype-card-head) { flex-wrap:wrap; }
+  #portalView :is(.stats,.module-summary-grid) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #portalView .module-summary-card, #portalView .stat-card { min-width:0; }
+  #portalView .request-row, #portalView .priority-item { grid-template-columns:minmax(0,1fr); }
+  #portalView .request-actions, #portalView .priority-actions { padding:0; display:flex; justify-content:flex-start; flex-wrap:wrap; }
+  #portalView :is(.tabs,.quote-progress,.dashboard-hero-actions) { max-width:100%; }
+  #portalView :is(.tabs,.quote-progress) { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  #portalView .toolbar { min-width:0; }
+  #portalView .search-wrap { max-width:100%; min-width:0; }
+  #portalView .search-wrap input { min-width:0; }
+  #portalView .quote-shell { max-width:100%; }
+  #portalView .quote-titlebar { display:flex; flex-direction:column; align-items:flex-start; }
+  #portalView .quote-draft-state { min-width:0; text-align:left; }
+  #portalView :is(.q-grid.cols-2,.q-grid.cols-3,.q-grid.cols-4,.pricing-grid,.pricing-grid.secondary,.production-grid,.production-grid.second,.review-kv-grid) { grid-template-columns:minmax(0,1fr); }
+  #portalView .review-costs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #portalView .quote-bottom-actions, #portalView .quote-footer-actions { align-items:stretch; }
+  #portalView .quote-bottom-actions .right, #portalView .quote-footer-actions .right { min-width:0; }
+  #portalView .quote-sidebar { width:100%; box-sizing:border-box; }
+  #portalView .quote-upload-toolbar, #portalView .upload-controls { max-width:100%; }
+  #portalView .quote-page-footer { grid-template-columns:1fr; justify-items:center; text-align:center; }
+  #portalView .quote-page-footer .footer-links { flex-wrap:wrap; justify-content:center; }
+  #portalView .notification-drawer { width:min(100vw,440px); max-width:100vw; }
+  #portalView .modal-backdrop { padding:12px; }
+  #portalView .modal { width:100%; max-height:calc(100dvh - 24px); overflow-y:auto; }
+  #portalView .toast { left:12px; right:12px; bottom:12px; max-width:none; }
+
+  /* Products & Prices: render existing row data as readable cards on phones. */
+  #portalView .pricing-main { padding:16px 12px 32px; }
+  #portalView .pricing-metrics { grid-template-columns:1fr; }
+  #portalView .pricing-filters { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; padding:13px; }
+  #portalView .pricing-filter, #portalView .pricing-filter-actions { min-width:0; }
+  #portalView .pricing-filter--search, #portalView .pricing-filter-actions { grid-column:1/-1; }
+  #portalView .pricing-filter-actions { align-items:stretch; }
+  #portalView .pricing-filter-actions .pricing-search-button { width:100%; }
+  #portalView .pricing-list-table { display:block; width:100%; min-width:0; }
+  #portalView .pricing-list-table thead { display:none; }
+  #portalView .pricing-list-table tbody { display:grid; gap:10px; padding:10px; }
+  #portalView .pricing-list-table tbody tr { display:grid; grid-template-columns:62px minmax(0,1fr); gap:7px 10px; border:1px solid #e1e7f1; border-radius:9px; padding:11px; min-width:0; }
+  #portalView .pricing-list-table tbody td { display:block; height:auto; min-width:0; padding:0; border:0; white-space:normal; text-align:left; }
+  #portalView .pricing-list-table tbody td.pricing-image-cell { grid-row:1/3; }
+  #portalView .pricing-list-table tbody td.pricing-product-cell { grid-column:2; }
+  #portalView .pricing-list-table tbody td.pricing-tiers-cell { grid-column:1/-1; padding-top:7px; border-top:1px solid #edf1f5; }
+  #portalView .pricing-list-table tbody td.pricing-request-cell { grid-column:1/-1; }
+  #portalView .pricing-list-table tbody td.pricing-updated { grid-column:1/-1; }
+  #portalView .pricing-list-table tbody td.pricing-updated::before { content:'Last updated: '; color:#8293ab; }
+  #portalView .pricing-list-table tbody td.pricing-list-actions { grid-column:1/-1; }
+  #portalView .pricing-list-table tbody td.pricing-list-actions .btn { width:100%; min-height:44px; justify-content:center; }
+  #portalView .pricing-list-table tbody tr:has(.pricing-empty) { display:block; }
+  #portalView .pricing-table-footer { height:auto; padding:12px; flex-wrap:wrap; justify-content:center; text-align:center; }
+  #portalView .pricing-pager-links { flex-wrap:wrap; justify-content:center; }
+  #portalView .pricing-product-summary { align-items:flex-start; }
+  #portalView .pricing-detail-edit { margin:0; width:100%; justify-content:center; }
+  #portalView .pricing-editor-grid, #portalView .pricing-detail-grid { grid-template-columns:minmax(0,1fr); }
+  #portalView .pricing-editor-bottom { flex-direction:column; align-items:stretch; }
+  #portalView .pricing-editor-cta { width:100%; justify-content:stretch; }
+  #portalView .pricing-editor-bottom :is(.pricing-cancel,.pricing-save,.pricing-submit) { min-height:44px; }
+  #portalView .pricing-tier-scroll { overflow-x:auto; }
+
+  /* Order detail: product and task values remain visible without horizontal scrolling. */
+  #supplierOrderView .supplier-prototype-main { padding:14px 12px 28px; }
+  #supplierOrderView .supplier-prototype-grid { grid-template-columns:minmax(0,1fr); gap:12px; }
+  #supplierOrderView .supplier-prototype-breadcrumbs { flex-wrap:wrap; min-width:0; overflow-wrap:anywhere; }
+  #supplierOrderView .supplier-prototype-breadcrumb-row { align-items:flex-start; flex-wrap:wrap; }
+  #supplierOrderView .supplier-prototype-back-btn { width:100%; justify-content:center; min-height:44px; }
+  #supplierOrderView .supplier-prototype-header h1 { overflow-wrap:anywhere; font-size:20px; line-height:1.35; }
+  #supplierOrderView .supplier-prototype-table { min-width:0; }
+  #supplierOrderView .supplier-prototype-table thead { display:none; }
+  #supplierOrderView .supplier-prototype-table tbody { display:block; }
+  #supplierOrderView .supplier-prototype-table tbody tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:14px; border-bottom:1px solid #e5ebf3; }
+  #supplierOrderView .supplier-prototype-table tbody td { display:block; min-width:0; height:auto; padding:0; border:0; white-space:normal; }
+  #supplierOrderView .supplier-prototype-table tbody td:first-child { grid-column:1/-1; }
+  #supplierOrderView .supplier-prototype-table tbody td:nth-child(2)::before { content:'Quantity'; }
+  #supplierOrderView .supplier-prototype-table tbody td:nth-child(3)::before { content:'Unit price'; }
+  #supplierOrderView .supplier-prototype-table tbody td:nth-child(4)::before { content:'Total price'; }
+  #supplierOrderView .supplier-prototype-table tbody td:not(:first-child)::before { display:block; color:#7a8ba4; font-size:11px; margin-bottom:3px; }
+  #supplierOrderView .supplier-prototype-product-cell { gap:10px; }
+  #supplierOrderView .supplier-prototype-summary-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #supplierOrderView .supplier-flow-original { padding:13px 10px; }
+  #supplierOrderView .supplier-flow-stages { display:flex; overflow-x:auto; gap:8px; padding-bottom:8px; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; }
+  #supplierOrderView .supplier-flow-stage { flex:0 0 min(170px,65vw); scroll-snap-align:start; }
+  #supplierOrderView .supplier-flow-task-head { flex-direction:column; align-items:flex-start; gap:8px; }
+  #supplierOrderView .supplier-flow-columns { display:none; }
+  #supplierOrderView .supplier-flow-table-scroll { overflow-x:visible; }
+  #supplierOrderView .supplier-flow-task { min-width:0; display:grid; grid-template-columns:28px minmax(0,1fr); align-items:start; gap:7px 10px; padding:13px 10px; }
+  #supplierOrderView .supplier-flow-task-icon { grid-column:1; grid-row:1; }
+  #supplierOrderView .supplier-flow-task-copy { grid-column:2; grid-row:1; }
+  #supplierOrderView .supplier-flow-assignee, #supplierOrderView .supplier-flow-date, #supplierOrderView .supplier-flow-task-status, #supplierOrderView .supplier-flow-action { grid-column:2; min-width:0; white-space:normal; }
+  #supplierOrderView .supplier-flow-assignee::before { content:'Assignee: '; color:#8191a6; font-weight:500; }
+  #supplierOrderView .supplier-flow-date::before { content:'Due: '; color:#8191a6; font-weight:500; }
+  #supplierOrderView .supplier-flow-task-status::before { content:'Status: '; color:#8191a6; font-weight:500; }
+  #supplierOrderView .supplier-flow-action-btn { min-height:44px; max-width:100%; }
+  #supplierOrderView .supplier-flow-dialog { width:calc(100vw - 20px); max-height:calc(100dvh - 20px); }
+  #supplierOrderView .supplier-flow-dialog .supplier-flow-action-form { min-width:0; }
+  #supplierOrderView .supplier-flow-dialog-actions { flex-wrap:wrap; }
+  #supplierOrderView .supplier-prototype-stage-panel { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-stage-rail { display:none; }
+  #supplierOrderView .supplier-prototype-stage-panel-head { flex-wrap:wrap; }
+  #supplierOrderView .supplier-prototype-artwork-row { flex-wrap:wrap; }
+}
+@media (max-width:480px) {
+  #portalView .topbar { padding-inline:8px; }
+  #portalView .topbar .brand { max-width:34vw; }
+  #portalView .topbar .brand :is(img,svg) { max-height:32px; }
+  #portalView .topbar-right { gap:2px; }
+  #portalView .account { padding-left:4px; }
+  #portalView .avatar { width:29px; height:29px; }
+  #portalView :is(.stats,.module-summary-grid,.review-costs) { grid-template-columns:minmax(0,1fr); }
+  #portalView .dashboard-hero-actions { grid-template-columns:1fr; }
+  #portalView .pricing-filters { grid-template-columns:minmax(0,1fr); }
+  #portalView .pricing-filter--search, #portalView .pricing-filter-actions { grid-column:auto; }
+  #portalView .pricing-editor-cta { flex-direction:column; }
+  #portalView .pricing-editor-bottom :is(.pricing-cancel,.pricing-save,.pricing-submit) { width:100%; }
+  #portalView .quote-bottom-actions .right, #portalView .quote-footer-actions .right { grid-template-columns:minmax(0,1fr); }
+  #portalView .quote-progress { grid-template-columns:1fr; }
+  #portalView .quote-progress-step { min-width:0; }
+  #portalView .review-doc-row { grid-template-columns:25px minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-summary-strip { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-table tbody tr { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-prototype-table tbody td:first-child { grid-column:1; }
+  #supplierOrderView .supplier-flow-quantities { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-flow-choice-grid { grid-template-columns:minmax(0,1fr); }
+  #supplierOrderView .supplier-flow-dialog-actions > button { flex:1 1 100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #portalView .sidebar, .supplier-mobile-backdrop { transition:none !important; }
+}
+
+/* Auth forms use the same shared stylesheet but no portal shell. */
+@media (max-width:900px) {
+  #loginView { display:grid; grid-template-columns:minmax(0,1fr); max-width:100%; }
+  #loginView .login-panel { min-height:100dvh; width:100%; min-width:0; padding:22px 24px; }
+  #loginView .login-art { display:none; }
+  #loginView .login-center { min-width:0; padding:26px 0; }
+  #loginView .login-card { max-width:440px; min-width:0; }
+}
+@media (max-width:480px) {
+  #loginView .login-panel { padding:16px; }
+  #loginView .login-center { padding:32px 0; }
+  #loginView .login-card h1 { font-size:27px; overflow-wrap:anywhere; }
+  #loginView .login-top { gap:10px; }
+  #loginView .field-row { align-items:flex-start; flex-direction:column; }
+  #loginView .login-footer { flex-wrap:wrap; gap:9px; justify-content:center; text-align:center; }
+  #loginView :is(input,select,textarea) { min-width:0; font-size:16px; }
+  #loginView .btn-block { white-space:normal; min-height:46px; }
+}
+@media (max-width:760px) {
+  /* Static and realtime-rendered RFQ/Order lists share the same mobile card structure. */
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table { display:block; min-width:0; width:100%; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table thead { display:none; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody { display:grid; gap:10px; padding:10px; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; border:1px solid #e1e7ee; border-radius:9px; padding:12px; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td { display:block; min-width:0; padding:0; height:auto; border:0; overflow-wrap:anywhere; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:first-child { grid-column:1/-1; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:last-child { grid-column:1/-1; text-align:left !important; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:last-child .btn { min-height:44px; }
+  #portalView #view-quotations .table-scroll > table tbody td:nth-child(2)::before { content:'Buyer'; }
+  #portalView #view-quotations .table-scroll > table tbody td:nth-child(3)::before { content:'Quantity'; }
+  #portalView #view-quotations .table-scroll > table tbody td:nth-child(4)::before { content:'Due'; }
+  #portalView #view-quotations .table-scroll > table tbody td:nth-child(5)::before { content:'Status'; }
+  #portalView #view-quotations .table-scroll > table tbody td:nth-child(6)::before { content:'Updated'; }
+  #portalView #view-orders .table-scroll > table tbody td:nth-child(2)::before { content:'Reference'; }
+  #portalView #view-orders .table-scroll > table tbody td:nth-child(3)::before { content:'Responsibility'; }
+  #portalView #view-orders .table-scroll > table tbody td:nth-child(4)::before { content:'Required by'; }
+  #portalView #view-orders .table-scroll > table tbody td:nth-child(5)::before { content:'Status'; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:not(:first-child):not(:last-child)::before { display:block; margin-bottom:2px; font-size:10.5px; color:#8292a7; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody tr:has(td[colspan]) { display:block; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td[colspan] { grid-column:1/-1; }
+  #portalView #view-orders .table-scroll > table tbody td:last-child > div { justify-content:flex-start !important; }
+}
+@media (max-width:480px) {
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody tr { grid-template-columns:minmax(0,1fr); }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:first-child,
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:last-child { grid-column:1; }
+  #portalView :is(#view-quotations,#view-orders) .table-scroll > table tbody td:last-child .btn { width:100%; justify-content:center; }
+}
+
+/* Login screen only: preserve the desktop split layout above 1120px.
+   The mobile single column must override both the desktop grid placement
+   and the desktop panel minimum widths. */
+#loginView.login-screen .login-brand { min-width:0; max-width:100%; }
+#loginView.login-screen .login-brand-logo {
+  display:block; height:46px; width:auto; max-width:min(240px, 55vw);
+  object-fit:contain; object-position:left center;
+}
+@media (max-width:1120px) {
+  #loginView.login-screen {
+    display:grid; grid-template-columns:minmax(0,1fr); width:100%; max-width:100%;
+  }
+  #loginView.login-screen .login-art { display:none; }
+  #loginView.login-screen .login-panel {
+    grid-column:1 / -1; grid-row:1; width:100%; min-width:0;
+    min-height:100vh; min-height:100dvh;
+    padding:clamp(18px, 4vw, 42px); border-left:0;
+  }
+  #loginView.login-screen .login-center { min-width:0; padding:32px 0; }
+  #loginView.login-screen .login-card { min-width:0; width:100%; max-width:440px; }
+  #loginView.login-screen .login-footer { flex-wrap:wrap; gap:12px 18px; }
+}
+@media (max-width:540px) {
+  #loginView.login-screen .login-panel { padding:18px 16px; }
+  #loginView.login-screen .login-top { min-width:0; gap:10px; }
+  #loginView.login-screen .login-brand-logo { height:42px; max-width:min(200px, 65vw); }
+  #loginView.login-screen .login-center { padding:30px 0; }
+  #loginView.login-screen .login-card h1 { font-size:clamp(25px, 7vw, 29px); }
+  #loginView.login-screen .field-row { align-items:flex-start; flex-direction:column; gap:8px; }
+  #loginView.login-screen .field-row .checkbox-label { max-width:100%; }
+  #loginView.login-screen :is(input, select, textarea) { min-width:0; font-size:16px; }
+  #loginView.login-screen .login-footer { justify-content:center; text-align:center; }
+  #loginView.login-screen .btn-block { white-space:normal; min-height:48px; }
+}
+@media (max-width:360px) {
+  #loginView.login-screen .login-panel { padding-inline:12px; }
+  #loginView.login-screen .login-card h1 { overflow-wrap:anywhere; }
+}

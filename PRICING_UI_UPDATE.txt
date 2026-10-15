@@ -1,0 +1,36 @@
+FlowTrack Supplier Portal - pricing UI refinement (13 Oct 2026)
+
+Changes are limited to the supplier Products & Prices list, a new read-only
+Product Details page, the Edit Supplier Prices interface, and optional product
+thumbnail handling in the existing signed supplier-catalog synchronization.
+
+New navigation:
+  Products & Prices -> View -> Product Details -> Edit Prices
+The list has a separate Image column and only a View action per row.
+The editor has no Change column or How it works sidebar. Typography is lighter.
+
+Existing supplier price proposal storage, version checks, delivery, authorization,
+realtime catalog revision, filters, pagination and Save Draft behavior are preserved.
+No migrations or new database queries per product row are introduced.
+
+Image source:
+- The supplier sync accepts an OPTIONAL products[].image_url value alongside
+  the existing products[].id / name / code / active / supplier_prices / price_version.
+- This field must be an absolute HTTP(S) image URL hosted on the same origin as
+  the supplier portal's existing FLOWTRACK_BUYER_URL configuration.
+- FlowTracker's sending project must supply the image_url field in its already
+  signed supplier-catalog payload. Old senders remain compatible but show the
+  placeholder until they do so. Image resources must be browser-accessible;
+  do not send private product image endpoints that require buyer login.
+- Only that configured origin is allowed in the supplier portal image CSP.
+- No customer prices, private buyer tokens, or image download service are added.
+
+Install the PATCH in the supplier portal root (back up first):
+  unzip -o flowtrack-supplier-pricing-refinement-patch.zip
+  php artisan optimize:clear
+
+Then run using an environment with PHP dom, mbstring, xmlwriter and a DB driver:
+  php artisan test --filter=SupplierProductPriceNavigationTest
+  php artisan test --filter=FlowtrackSupplierCatalogApiTest
+
+The patch contains no .env, vendor libraries, log files, or database dumps.

@@ -1,0 +1,99 @@
+/* Scoped visual port of FlowTracker's Order process & tasks component. */
+#supplierOrderView .supplier-flow-original{margin:0;padding:16px 15px 18px;border:1px solid #d4e1ed;border-radius:14px;background:#fff;color:#152941;font-family:inherit;box-shadow:0 4px 13px rgba(10,35,60,.025)}
+#supplierOrderView .supplier-flow-original *{box-sizing:border-box}
+#supplierOrderView .supplier-flow-process-head{padding:0 0 11px;border-bottom:1px solid #dbe5ed}
+#supplierOrderView .supplier-flow-process-head h2{font-size:19px;font-weight:850;line-height:1.3;margin:0 0 4px;color:#142840}
+#supplierOrderView .supplier-flow-sub{font-size:12px;color:#7789a2}
+#supplierOrderView .supplier-flow-stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;padding:0 0 12px;margin-top:0}
+#supplierOrderView .supplier-flow-stage{min-height:136px;padding:10px 9px;text-align:left;display:flex;flex-direction:column;position:relative;min-width:0;gap:0;background:#fff;color:#14253f;border:1px solid #dbe5ef;border-top:4px solid var(--stage);border-radius:13px;cursor:pointer;font:inherit}
+#supplierOrderView .supplier-flow-stage.viewing{border:2px solid var(--stage);border-top:5px solid var(--stage);box-shadow:0 0 0 2px color-mix(in srgb,var(--stage) 16%,transparent);padding:9px 8px}
+#supplierOrderView .supplier-flow-stage.locked{opacity:.47;cursor:not-allowed}
+#supplierOrderView .supplier-flow-stage-num{font-size:10px;font-weight:900;letter-spacing:.06em;color:#77869a}
+#supplierOrderView .supplier-flow-stage-name{font-size:15px;line-height:1.25;margin:6px 0 7px;font-weight:850;overflow-wrap:anywhere}
+#supplierOrderView .supplier-flow-stage-state{font-size:10px;line-height:1.3;min-height:23px;color:#6a7d95;font-weight:700}
+#supplierOrderView .supplier-flow-stage.viewing .supplier-flow-stage-state{color:var(--stage)}
+#supplierOrderView .supplier-flow-progress{display:block;height:5px;background:#edf2f6;border-radius:10px;overflow:hidden;margin:3px 0 7px;width:100%}
+#supplierOrderView .supplier-flow-progress i{display:block;height:100%;background:var(--stage)}
+#supplierOrderView .supplier-flow-owner{display:flex;gap:6px;align-items:center;font-size:10px;font-weight:700;color:#53667e;min-width:0;overflow:hidden}
+#supplierOrderView .supplier-flow-avatar{flex:0 0 auto;display:inline-flex;height:23px;width:23px;border-radius:50%;align-items:center;justify-content:center;background:#e5f5f1;color:#168c81;font-weight:850;font-size:10px;text-transform:uppercase}
+#supplierOrderView .supplier-flow-dependency{font-size:9px;color:#96a5b9;margin-top:5px;line-height:1.4}
+#supplierOrderView .supplier-flow-stage-check{position:absolute;right:9px;top:9px;color:#14917d;font-weight:800}
+#supplierOrderView .supplier-flow-task-panel{border:1px solid #d7e3ed;border-radius:13px;overflow:hidden;background:#fff}
+#supplierOrderView .supplier-flow-task-panel[hidden]{display:none}
+#supplierOrderView .supplier-flow-task-head{padding:13px 15px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+#supplierOrderView .supplier-flow-task-head h3{font-size:17px;font-weight:850;margin:0 0 4px;color:#142840}
+#supplierOrderView .supplier-flow-task-head p{font-size:11px;color:#7890aa;margin:0}
+#supplierOrderView .supplier-flow-required{font-size:11px;color:#008e7c;white-space:nowrap}
+#supplierOrderView .supplier-flow-columns,#supplierOrderView .supplier-flow-task{display:grid;grid-template-columns:28px minmax(155px,2fr) minmax(100px,1fr) minmax(90px,.85fr) minmax(98px,1fr) minmax(100px,1fr);align-items:center;gap:7px;min-width:720px}
+#supplierOrderView .supplier-flow-columns{padding:10px 12px;background:#f5f8fb;border-top:1px solid #dde7f0;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:850;color:#61738e}
+#supplierOrderView .supplier-flow-task{padding:10px 12px;min-height:65px;border-top:1px solid #e0e9f1;border-left:5px solid var(--task-color)}
+#supplierOrderView .supplier-flow-task:nth-child(even){background:#f8fbfd}
+#supplierOrderView .supplier-flow-task.locked{opacity:.57}
+#supplierOrderView .supplier-flow-task-icon{height:25px;width:25px;border-radius:50%;background:#e5f7f5;color:#008e83;display:grid;place-items:center;font-weight:900}
+#supplierOrderView .supplier-flow-task-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+#supplierOrderView .supplier-flow-task-code{font-size:10px;color:#7b8fa6;letter-spacing:.05em}
+#supplierOrderView .supplier-flow-task-copy strong{font-size:13px;line-height:1.3;font-weight:800}
+#supplierOrderView .supplier-flow-optional{font-size:10px;color:#68809a}
+#supplierOrderView .supplier-flow-assignee{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:#52657d;overflow-wrap:anywhere}
+#supplierOrderView .supplier-flow-date{font-size:11px;font-weight:750;white-space:nowrap}
+#supplierOrderView .supplier-flow-pill{background:#e1f5f0;color:#087f72;border-radius:30px;display:inline-block;font-size:10px;font-weight:800;padding:5px 8px}
+#supplierOrderView .supplier-flow-pill.locked{background:#e9eff4;color:#6d7f92}
+#supplierOrderView .supplier-flow-pill.done{background:#dff4e6;color:#187b50}
+#supplierOrderView .supplier-flow-no-action{color:#a3afbd}
+#supplierOrderView .supplier-flow-action-btn{background:#008c7e;color:white;border:0;border-radius:9px;padding:10px 12px;display:inline-block;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer;white-space:normal;text-align:center}
+#supplierOrderView .supplier-flow-action details{position:relative}
+#supplierOrderView .supplier-flow-action summary{list-style:none}
+#supplierOrderView .supplier-flow-action summary::-webkit-details-marker{display:none}
+#supplierOrderView .supplier-flow-action-form{position:relative;z-index:3;padding:12px 10px;border:1px solid #d4e2eb;border-radius:8px;margin-top:7px;background:white;display:flex;flex-direction:column;gap:9px;min-width:180px;box-shadow:0 4px 16px rgba(15,35,60,.08)}
+#supplierOrderView .supplier-flow-action-form label{font-size:11px;color:#53677e;display:flex;flex-direction:column;gap:4px}
+#supplierOrderView .supplier-flow-action-form input,#supplierOrderView .supplier-flow-action-form select,#supplierOrderView .supplier-flow-action-form textarea{font:inherit;font-size:12px;padding:7px;width:100%;border:1px solid #c9d8e4;border-radius:5px;background:#fff;color:#14253f}
+#supplierOrderView .supplier-flow-quantities{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+#supplierOrderView .supplier-flow-error,#supplierOrderView .supplier-flow-success{padding:10px 12px;margin:10px 0;border-radius:7px;font-size:13px}
+#supplierOrderView .supplier-flow-error{background:#fff2f2;color:#a11b1b}
+#supplierOrderView .supplier-flow-success{background:#eff9f5;color:#087354}
+#supplierOrderView .supplier-flow-empty{padding:16px;font-size:12px;color:#70829a}
+#supplierOrderView .supplier-flow-table-scroll{overflow-x:auto}
+@media(max-width:1250px){#supplierOrderView .supplier-flow-stages{display:flex;overflow-x:auto;gap:7px;scroll-snap-type:x proximity}#supplierOrderView .supplier-flow-stage{flex:0 0 155px;scroll-snap-align:start}}
+@media(max-width:920px){#supplierOrderView .supplier-flow-columns,#supplierOrderView .supplier-flow-task{min-width:720px}}
+@media(max-width:650px){#supplierOrderView .supplier-flow-original{padding:13px 10px}#supplierOrderView .supplier-flow-stages{gap:10px}#supplierOrderView .supplier-flow-task-head{align-items:flex-start;flex-direction:column}#supplierOrderView .supplier-flow-stage-name{font-size:15px}}
+
+/* Supplier task actions use a top-layer dialog: never expand the grid/table row. */
+#supplierOrderView .supplier-flow-dialog{position:fixed;top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;width:min(560px,calc(100vw - 28px));max-height:min(85dvh,780px);padding:0;border:1px solid #d6e3ee;border-radius:15px;background:#fff;color:#172b44;box-shadow:0 22px 70px rgba(13,35,58,.23);overflow-y:auto;overscroll-behavior:contain;z-index:10000}
+#supplierOrderView .supplier-flow-dialog:not([open]){display:none}
+#supplierOrderView .supplier-flow-dialog::backdrop{background:rgba(15,30,50,.62);backdrop-filter:blur(2px)}
+#supplierOrderView .supplier-flow-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:19px 22px 15px;border-bottom:1px solid #e1e9f0}
+#supplierOrderView .supplier-flow-dialog-head h4{margin:0 0 5px;font-size:18px;font-weight:850;line-height:1.35;color:#142840}
+#supplierOrderView .supplier-flow-dialog-head p{font-size:12px;margin:0;color:#73869c;line-height:1.4}
+#supplierOrderView .supplier-flow-dialog-close{border:0;background:#eef3f7;color:#60758b;border-radius:9px;cursor:pointer;font-size:21px;width:32px;height:32px;display:grid;place-items:center;flex:0 0 32px}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form{border:0;border-radius:0;box-shadow:none;min-width:0;margin:0;padding:18px 22px 22px;gap:14px;position:static}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form label{font-size:12px;font-weight:700;color:#405772;gap:7px;min-width:0}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form input:not([type=checkbox]),#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form select,#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form textarea{font-size:13px;min-height:39px;padding:10px 11px;border-radius:8px;max-width:100%}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form textarea{min-height:72px;resize:vertical}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form :is(input,textarea,select):focus-visible{outline:2px solid #008b7d;outline-offset:2px}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form small{font-size:11px;line-height:1.5;color:#73869a}
+#supplierOrderView .supplier-flow-dialog-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;border-top:1px solid #e4ebf2;padding-top:16px;margin-top:2px}
+#supplierOrderView .supplier-flow-cancel{padding:10px 16px;background:#fff;border:1px solid #ccdae7;border-radius:8px;color:#435772;font-size:12px;font-weight:800;cursor:pointer}
+#supplierOrderView .supplier-flow-dialog-actions .supplier-flow-action-btn{padding:11px 16px;border-radius:8px}
+#supplierOrderView .supplier-flow-dialog-actions .supplier-flow-action-btn:disabled{opacity:.55;cursor:wait}
+#supplierOrderView .supplier-flow-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#supplierOrderView .supplier-flow-choice{min-height:135px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;padding:15px 12px;background:#fff;border:1px solid #d4e1ed;border-radius:11px;color:#172b44;cursor:pointer;font:inherit}
+#supplierOrderView .supplier-flow-choice:is(:hover,.selected){border-color:#008b7d;background:#f1faf7;box-shadow:0 0 0 1px #008b7d}
+#supplierOrderView .supplier-flow-choice:focus-visible{outline:2px solid #008b7d;outline-offset:2px}
+#supplierOrderView .supplier-flow-choice-icon{height:36px;width:36px;display:grid;place-items:center;border-radius:50%;background:#e5f5f0;color:#008b7d;font-size:18px;font-weight:800}
+#supplierOrderView .supplier-flow-choice strong{font-size:13px;font-weight:800}
+#supplierOrderView .supplier-flow-choice small{font-size:11px;color:#73869a}
+#supplierOrderView .supplier-flow-helper{margin:0 0 14px;font-size:12px;color:#637a91;line-height:1.6}
+#supplierOrderView .supplier-flow-decision-stage[hidden]{display:none}
+#supplierOrderView .supplier-flow-revision-item{padding:12px;border:1px solid #dde6ef;border-radius:9px;display:flex;flex-direction:column;gap:12px;margin-bottom:11px}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-checkbox{display:flex;flex-direction:row;align-items:flex-start;gap:8px;overflow-wrap:anywhere}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-checkbox input{width:17px;height:17px;flex:0 0 17px;margin:0}
+#supplierOrderView .supplier-flow-back{background:transparent;border:0;padding:10px 0 0;color:#008778;font-size:12px;font-weight:800;cursor:pointer}
+#supplierOrderView .supplier-flow-muted{color:#8798a8;font-weight:500}
+#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form fieldset{min-width:0;padding:12px;border:1px solid #dce6ef;border-radius:9px}
+@media(max-width:520px){#supplierOrderView .supplier-flow-choice-grid{grid-template-columns:1fr}#supplierOrderView .supplier-flow-choice{min-height:100px}#supplierOrderView .supplier-flow-dialog-head{padding:16px}#supplierOrderView .supplier-flow-dialog .supplier-flow-action-form{padding:16px}#supplierOrderView .supplier-flow-dialog-actions{position:sticky;bottom:-16px;background:#fff;padding-bottom:12px}}
+
+
+/* Buyer-managed production target, shown only on the Production task panel. */
+#supplierOrderView .supplier-flow-delivery-target{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:0 14px 12px;padding:10px 12px;border:1px solid #b8dfd7;background:#eef8f5;border-radius:7px;color:#315e59;font-size:12px;line-height:1.5}
+#supplierOrderView .supplier-flow-delivery-target strong{font-size:14px;color:#087a69}
+#supplierOrderView .supplier-flow-delivery-target small{color:#56827a;font-size:11px}
