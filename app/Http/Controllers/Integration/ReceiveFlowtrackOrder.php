@@ -46,6 +46,11 @@ final class ReceiveFlowtrackOrder extends Controller
             'order.title' => ['required_unless:order.revoked,true', 'string', 'max:255'],
             'order.created_at' => ['nullable', 'date'],
             'order.status' => ['sometimes', 'string', 'max:80'],
+            'order.on_hold' => ['sometimes', 'boolean'],
+            'order.stage_sequence' => ['sometimes', 'integer', 'between:1,7'],
+            'order.stage_name' => ['sometimes', 'string', 'max:100'],
+            'order.stage_color' => ['sometimes', 'string', 'regex:/^#[0-9a-f]{6}$/i'],
+            'order.progress' => ['sometimes', 'integer', 'between:0,100'],
             'order.currency' => ['sometimes', 'string', 'regex:/^[A-Z]{3}$/'],
             'order.delivery_date' => ['nullable', 'date_format:Y-m-d'],
             'order.supplier_ship_date' => ['nullable', 'date_format:Y-m-d'],
@@ -149,6 +154,22 @@ final class ReceiveFlowtrackOrder extends Controller
                     'supplier_ship_date' => $order['supplier_ship_date'] ?? null,
                     'estimated_delivery_date' => $order['estimated_delivery_date'] ?? null,
                     'order_status' => $order['status'] ?? 'New',
+                    // Store the authenticated supplier's list projection only.
+                    // Legacy payloads remain readable until FlowTracker resyncs them.
+                    'listing' => [
+                        'on_hold' => (bool) ($order['on_hold'] ?? false),
+                        'stage_sequence' => (int) ($order['stage_sequence'] ?? 0),
+                        'stage_name' => (string) ($order['stage_name'] ?? ''),
+                        'stage_color' => (string) ($order['stage_color'] ?? ''),
+                        'progress' => (int) ($order['progress'] ?? 0),
+                        'created_date' => isset($order['created_at']) && is_string($order['created_at'])
+                            ? substr($order['created_at'], 0, 10) : null,
+                        // Search only the supplier-visible labels, not private notes or prices.
+                        'search_text' => mb_strtolower(implode(' ', array_filter([
+                            $order['reference'],
+                            ...array_column($order['items'] ?? [], 'product_name'),
+                        ]))),
+                    ],
                     'currency' => $order['currency'] ?? 'USD',
                     'supplier_instruction' => $order['supplier_instruction'] ?? '',
                     'items' => array_map(static fn (array $item): array => [

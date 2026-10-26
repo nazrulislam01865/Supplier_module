@@ -1,0 +1,147 @@
+/* Orders & Requests: FlowTracker order-list layout, scoped to this portal screen.
+   Reuses the portal's typography, button colors, and theme tokens. */
+#portalView #view-orders .page-header { margin-bottom: 16px; }
+#portalView #view-orders .supplier-orders-list {
+  background: var(--surface); border: 1px solid var(--line-dark);
+  border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(22,43,73,.035);
+}
+#portalView #view-orders .supplier-orders-filter-toolbar { padding: 14px 15px 13px; display: grid; gap: 9px; }
+#portalView #view-orders .supplier-orders-search { width: 100%; min-height: 44px; display:flex; align-items:center; gap:14px; padding: 0 13px; border:1px solid var(--line-dark); border-radius:9px; color:#879bb5; background:#fff; }
+#portalView #view-orders .supplier-orders-search:focus-within { border-color:var(--teal); box-shadow:0 0 0 3px rgba(10,143,122,.09); }
+#portalView #view-orders .supplier-orders-search input { flex:1; min-width:0; height:42px; min-height:42px; padding:0; border:0; background:transparent; box-shadow:none; font-size:13px; color:var(--ink); }
+#portalView #view-orders .supplier-orders-filter-controls { display:grid; grid-template-columns: minmax(85px,.6fr) minmax(120px,.85fr) minmax(160px,1.4fr) minmax(160px,1.35fr) minmax(160px,1.35fr) auto; gap:9px; align-items:stretch; }
+#portalView #view-orders .supplier-orders-filter-chip { min-height:44px; display:flex; align-items:center; justify-content:center; gap:12px; border:1px solid var(--line-dark); border-radius:9px; padding:0 12px; color:#30435f; background:#fff; font-size:12.5px; font-weight:650; white-space:nowrap; }
+#portalView #view-orders .supplier-orders-filter-chip.is-active { background:var(--teal-soft); border-color:#78d4c5; color:var(--teal-2); }
+#portalView #view-orders .supplier-orders-hold input { accent-color:var(--teal); width:16px; height:16px; min-height:16px; padding:0; margin:0; border-radius:4px; }
+#portalView #view-orders .supplier-orders-filter-select { min-height:44px; height:44px; border-radius:9px; border:1px solid var(--line-dark); background-color:#fff; font-size:12.5px; font-weight:600; padding:0 30px 0 12px; color:#30435f; max-width:100%; }
+#portalView #view-orders .supplier-orders-date { display:flex; align-items:center; gap:7px; color:#657b99; font-weight:650; font-size:11px; white-space:nowrap; }
+#portalView #view-orders .supplier-orders-date input { flex:1; min-width:0; min-height:44px; height:44px; border-radius:9px; border:1px solid var(--line-dark); padding:0 9px; font-size:12px; color:#25344e; background:#fff; }
+#portalView #view-orders .supplier-orders-clear { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:0 12px; border:1px solid var(--line-dark); border-radius:9px; color:#74849b; font-size:12px; font-weight:650; white-space:nowrap; }
+#portalView #view-orders .supplier-orders-clear:not(.is-disabled):hover { color:var(--teal-2); border-color:#94cabe; }
+#portalView #view-orders .supplier-orders-clear.is-disabled { opacity:.52; }
+#portalView #view-orders .supplier-orders-noscript-submit { position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; }
+#portalView #view-orders .supplier-orders-list-summary { min-height:37px; padding:0 16px; background:#f5f8fb; border-top:1px solid var(--line); border-bottom:1px solid var(--line); color:#67809d; font-size:11.5px; font-weight:650; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+#portalView #view-orders .supplier-orders-table-viewport { overflow-x:auto; }
+#portalView #view-orders .supplier-orders-table { table-layout:fixed; min-width:850px; width:100%; border-collapse:collapse; }
+#portalView #view-orders .supplier-orders-table th { height:37px; padding:9px 13px; background:#f7f9fc; color:#69819e; text-align:left; text-transform:uppercase; font-size:10px; letter-spacing:.075em; font-weight:750; border-bottom:1px solid var(--line); }
+#portalView #view-orders .supplier-orders-table th:nth-child(1) { width:19%; }
+#portalView #view-orders .supplier-orders-table th:nth-child(2) { width:28%; }
+#portalView #view-orders .supplier-orders-table th:nth-child(3) { width:16%; }
+#portalView #view-orders .supplier-orders-table th:nth-child(4) { width:13%; }
+#portalView #view-orders .supplier-orders-table th:nth-child(5) { width:14%; }
+#portalView #view-orders .supplier-orders-table th:nth-child(6) { width:10%; }
+#portalView #view-orders .supplier-order-row { cursor:pointer; box-shadow:inset 4px 0 0 var(--supplier-order-accent); background:color-mix(in srgb, var(--supplier-order-accent) 8%, white); transition:background-color .15s ease; }
+#portalView #view-orders .supplier-order-row:nth-child(even) { background:color-mix(in srgb, var(--supplier-order-accent) 10%, white); }
+#portalView #view-orders .supplier-order-row:hover, #portalView #view-orders .supplier-order-row:focus-visible { background:color-mix(in srgb, var(--supplier-order-accent) 16%, white); }
+#portalView #view-orders .supplier-order-row:focus-visible { outline:2px solid var(--teal); outline-offset:-3px; }
+#portalView #view-orders .supplier-orders-table td { height:73px; padding:11px 13px; border-bottom:1px solid var(--line); font-size:12px; color:#263a56; vertical-align:middle; min-width:0; }
+#portalView #view-orders .supplier-order-ref { color:var(--teal-2); font-size:14px; font-weight:800; letter-spacing:.01em; overflow-wrap:anywhere; }
+#portalView #view-orders .supplier-order-ref:hover { text-decoration:underline; }
+#portalView #view-orders .supplier-order-subline, #portalView #view-orders .supplier-order-product-copy small { display:block; margin-top:3px; color:#7487a0; font-size:11px; font-weight:450; line-height:1.35; }
+#portalView #view-orders .supplier-order-subline { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#portalView #view-orders .supplier-order-product-cell { display:flex; align-items:center; gap:11px; min-width:0; }
+#portalView #view-orders .supplier-order-product-avatar { width:38px; height:38px; border-radius:11px; flex:none; display:grid; place-items:center; background:#e5f6f2; border:1px solid #cceee6; color:var(--teal-2); font-size:12px; font-weight:800; }
+#portalView #view-orders .supplier-order-product-copy { min-width:0; }
+#portalView #view-orders .supplier-order-product-copy strong { display:block; color:#20334f; font-size:13px; font-weight:750; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#portalView #view-orders .supplier-order-product-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#portalView #view-orders .supplier-order-stage { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:5px 10px; background:color-mix(in srgb, var(--supplier-order-stage) 9%, white); color:color-mix(in srgb, var(--supplier-order-stage) 80%, #14213d); border:1px solid color-mix(in srgb, var(--supplier-order-stage) 27%, white); white-space:nowrap; font-size:11.5px; font-weight:750; }
+#portalView #view-orders .supplier-order-stage-dot { width:7px; height:7px; border-radius:100%; background:var(--supplier-order-stage); }
+#portalView #view-orders .supplier-order-status { color:#188658; background:#dff5e8; padding:5px 10px; border-radius:999px; font-size:11.5px; font-weight:750; white-space:nowrap; display:inline-flex; }
+#portalView #view-orders .supplier-order-status.is-held { color:#a36112; background:#fff2de; }
+#portalView #view-orders .supplier-order-hold-label { display:block; margin-top:5px; font-size:10.5px; color:#9b5c00; font-weight:750; }
+#portalView #view-orders .supplier-order-flag { display:block; color:#a36112; margin-top:4px; font-size:10px; }
+#portalView #view-orders .supplier-order-delivery-date { font-weight:650; font-variant-numeric:tabular-nums; color:#263a56; }
+#portalView #view-orders .supplier-order-progress { display:flex; align-items:center; gap:10px; }
+#portalView #view-orders .supplier-order-progress-track { flex:1; min-width:28px; height:7px; border-radius:99px; background:#e0e8f0; overflow:hidden; display:block; }
+#portalView #view-orders .supplier-order-progress-track > span { height:100%; border-radius:99px; background:var(--teal); display:block; }
+#portalView #view-orders .supplier-order-progress strong { color:#1e344f; font-size:13px; font-variant-numeric:tabular-nums; font-weight:800; min-width:34px; text-align:right; }
+#portalView #view-orders .supplier-orders-empty { text-align:center; padding:50px 10px !important; background:#fff; height:auto !important; }
+#portalView #view-orders .supplier-orders-empty strong, #portalView #view-orders .supplier-orders-empty span { display:block; margin:3px 0; }
+#portalView #view-orders .supplier-orders-empty span { color:var(--muted); }
+#portalView #view-orders .supplier-orders-pagination { min-height:65px; padding:13px 15px; display:flex; justify-content:space-between; align-items:center; gap:15px; font-size:12px; color:#7b8ca4; }
+#portalView #view-orders .supplier-orders-page-controls { display:flex; gap:7px; align-items:center; }
+#portalView #view-orders .supplier-orders-page-button { display:inline-flex; justify-content:center; align-items:center; min-width:36px; height:36px; padding:0 9px; border:1px solid var(--line-dark); border-radius:9px; background:white; color:#1d3050; font-size:12px; font-weight:750; }
+#portalView #view-orders .supplier-orders-page-button.is-current { background:var(--teal); border-color:var(--teal); color:#fff; }
+#portalView #view-orders .supplier-orders-page-button.is-disabled { color:#b2becc; border-color:#e5ebf0; }
+#portalView #view-orders a.supplier-orders-page-button:hover:not(.is-current) { border-color:var(--teal); color:var(--teal); }
+@media (max-width: 1200px) {
+  #portalView #view-orders .supplier-orders-filter-controls { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #portalView #view-orders .supplier-orders-date { min-width:0; }
+}
+@media (max-width: 900px) {
+  #portalView #view-orders .supplier-orders-filter-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #portalView #view-orders .supplier-orders-filter-controls > * { min-width:0; }
+}
+@media (max-width: 650px) {
+  #portalView #view-orders .supplier-orders-filter-toolbar { padding:10px; }
+  #portalView #view-orders .supplier-orders-filter-controls { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+  #portalView #view-orders .supplier-orders-date { gap:6px; }
+  #portalView #view-orders .supplier-orders-filter-select, #portalView #view-orders .supplier-orders-filter-chip { font-size:12px; }
+  #portalView #view-orders .supplier-orders-list-summary { font-size:10px; padding:9px 12px; }
+  #portalView #view-orders .supplier-orders-table { min-width:0; display:block; }
+  #portalView #view-orders .supplier-orders-table thead { display:none; }
+  #portalView #view-orders .supplier-orders-table tbody { display:grid; gap:10px; padding:10px; }
+  #portalView #view-orders .supplier-orders-table tbody tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; border:1px solid var(--line); border-radius:10px; padding:12px 13px; }
+  #portalView #view-orders .supplier-orders-table tbody td { display:block; height:auto; padding:0; border:0; }
+  #portalView #view-orders .supplier-orders-table tbody td:nth-child(-n+2) { grid-column:1/-1; }
+  #portalView #view-orders .supplier-orders-table tbody td:nth-child(5), #portalView #view-orders .supplier-orders-table tbody td:nth-child(6) { grid-column:1/-1; }
+  #portalView #view-orders .supplier-orders-table tbody td[data-label]::before { content:attr(data-label); display:block; margin-bottom:4px; font-size:10px; color:#76899f; }
+  #portalView #view-orders .supplier-orders-table tbody td:first-child::before, #portalView #view-orders .supplier-orders-table tbody td:nth-child(2)::before { display:none; }
+  #portalView #view-orders .supplier-orders-table tbody tr:has(td[colspan]) { display:block; }
+  #portalView #view-orders .supplier-orders-pagination { flex-wrap:wrap; }
+}
+
+/* Supplier workflow stage overview: the FlowTracker card pattern, scoped to orders. */
+#portalView #view-orders .supplier-order-stages {
+  margin-bottom:14px; padding:17px; border:1px solid var(--line-dark);
+  border-radius:12px; background:var(--surface); box-shadow:0 3px 10px rgba(10,35,60,.03);
+}
+#portalView #view-orders .supplier-order-stage-grid {
+  display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px;
+}
+#portalView #view-orders .supplier-order-stage-card {
+  position:relative; display:flex; flex-direction:column; min-width:0; gap:0; padding:10px 11px;
+  border:1px solid color-mix(in srgb,var(--supplier-stage) 28%,#d9e3ec); border-radius:12px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--supplier-stage) 7%,white),color-mix(in srgb,var(--supplier-stage) 3%,white));
+  text-align:left; color:var(--ink); transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+#portalView #view-orders .supplier-order-stage-card:hover {
+  border-color:color-mix(in srgb,var(--supplier-stage) 48%,#d9e3ec);
+  box-shadow:0 7px 18px color-mix(in srgb,var(--supplier-stage) 10%,transparent); transform:translateY(-1px);
+}
+#portalView #view-orders .supplier-order-stage-card.is-selected {
+  border:2px solid var(--supplier-stage); padding:9px 10px;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--supplier-stage) 18%,transparent);
+}
+#portalView #view-orders .supplier-order-stage-card:focus-visible {
+  outline:3px solid color-mix(in srgb,var(--supplier-stage) 32%,transparent); outline-offset:2px;
+}
+/* Keep the stage-card typography at FlowTracker order-list scale. */
+#portalView #view-orders .supplier-order-stage-kicker {
+  color:color-mix(in srgb,var(--supplier-stage) 82%,#334155); font-size:10px; line-height:1.2; font-weight:750; text-transform:uppercase; letter-spacing:.015em;
+}
+#portalView #view-orders .supplier-order-stage-name {
+  margin:4px 0 7px; font-size:14px; font-weight:750; line-height:1.2; color:var(--navy);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#portalView #view-orders .supplier-order-stage-bottom {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:8px; margin-top:auto;
+  color:var(--muted); font-size:10.5px; line-height:1.2; font-weight:500;
+}
+#portalView #view-orders .supplier-order-stage-bottom b {
+  color:color-mix(in srgb,var(--supplier-stage) 82%,var(--ink)); font-size:20px; line-height:1; font-weight:800; font-variant-numeric:tabular-nums;
+}
+#portalView #view-orders .supplier-order-stage-check {
+  position:absolute; top:7px; right:7px; display:grid; place-items:center; width:18px; height:18px;
+  border-radius:50%; color:#fff; background:var(--supplier-stage); font-size:12px; font-weight:750;
+}
+@media (max-width:1100px) {
+  #portalView #view-orders .supplier-order-stage-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:520px) {
+  #portalView #view-orders .supplier-order-stages { padding:10px; }
+  #portalView #view-orders .supplier-order-stage-grid { gap:8px; }
+  #portalView #view-orders .supplier-order-stage-name { font-size:13px; }
+  #portalView #view-orders .supplier-order-stage-bottom { font-size:10px; }
+  #portalView #view-orders .supplier-order-stage-bottom b { font-size:18px; }
+}

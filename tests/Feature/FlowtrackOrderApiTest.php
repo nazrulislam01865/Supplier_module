@@ -41,6 +41,35 @@ class FlowtrackOrderApiTest extends TestCase
         ];
     }
 
+
+    public function test_signed_supplier_list_fields_use_buyer_set_delivery_stage_and_progress(): void
+    {
+        config()->set('flowtrack_bridge.enabled', true);
+        config()->set('flowtrack_bridge.secret', 'test-bridge-secret-at-least-32-characters');
+        $company = SupplierCompany::create([
+            'reference' => 'SUP001', 'name' => 'One', 'active' => true, 'flowtrack_supplier_id' => 101,
+        ]);
+        $data = $this->data(101);
+        $data['order']['stage_sequence'] = 3;
+        $data['order']['stage_name'] = 'Production';
+        $data['order']['stage_color'] = '#f28c28';
+        $data['order']['progress'] = 43;
+        $data['order']['on_hold'] = true;
+        $data['order']['supplier_ship_date'] = '2026-11-10';
+        $data['order']['estimated_delivery_date'] = '2026-12-20';
+        $body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk();
+
+        $saved = SupplierResource::where('supplier_company_id', $company->id)->where('type', 'order')->firstOrFail()->payload;
+        $this->assertSame(3, $saved['listing']['stage_sequence']);
+        $this->assertSame(43, $saved['listing']['progress']);
+        $this->assertTrue($saved['listing']['on_hold']);
+        $this->assertSame('2026-11-10', $saved['supplier_ship_date']);
+        $this->assertArrayNotHasKey('client_code', $saved['listing']);
+        $this->assertArrayNotHasKey('owner_name', $saved['listing']);
+    }
+
     public function test_signed_delivery_is_isolated_and_idempotent(): void
     {
         config()->set('flowtrack_bridge.enabled', true);

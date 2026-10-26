@@ -39,6 +39,17 @@
     }
 
     function switchView(name) {
+      // Order stage cards are computed when Laravel renders the Orders view.
+      // Load that view on the server when entering Orders from another workspace.
+      if (name === 'orders') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('view') !== 'orders' && !params.has('orders_page')) {
+          const url = new URL(window.location.href);
+          url.search = '?view=orders';
+          window.location.assign(url.toString());
+          return;
+        }
+      }
       document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden'));
       const target = el(`view-${name}`);
       if (target) target.classList.remove('hidden');

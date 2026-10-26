@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SupplierResource;
 use App\Services\SupplierDashboardData;
+use App\Services\SupplierOrderListing;
 use App\Services\SupplierScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
@@ -68,7 +69,7 @@ class PortalController extends Controller
         return response()->json(['unread' => 0])->header('Cache-Control', 'private, no-store');
     }
 
-    public function index(Request $request, SupplierDashboardData $data)
+    public function index(Request $request, SupplierDashboardData $data, SupplierOrderListing $orderListing)
     {
         $user = $request->user();
         abort_unless($user->active && $user->company?->active, 403);
@@ -95,35 +96,15 @@ class PortalController extends Controller
             'port' => (int) config('supplier_realtime.port'),
             'scheme' => (string) config('supplier_realtime.scheme'),
         ];
-        // Orders are paginated, scoped to the authenticated supplier company.
-        // Historical backfills can contain many records; do not load the entire archive.
-        $orderPage = SupplierResource::query()
-            ->where('supplier_company_id', $company->id)
-            ->where('type', 'order')->where('status', '!=', 'revoked')
-            ->latest('id')->paginate(50, ['id', 'external_reference', 'status', 'payload', 'due_at', 'created_at'], 'orders_page');
-        $orders = $orderPage->getCollection()->map(function (SupplierResource $resource): array {
-            $payload = $resource->payload ?? [];
-            $originalDate = $payload['created_at'] ?? null;
-            try {
-                $created = $originalDate ? \Illuminate\Support\Carbon::parse($originalDate)->format('M j, Y') : ($resource->created_at?->format('M j, Y') ?? '');
-            } catch (\Throwable $exception) {
-                $created = '';
-            }
-            return [
-                'id' => $resource->id,
-                'reference' => $resource->external_reference,
-                'title' => 'Order '.$resource->external_reference,
-                'items' => $payload['items'] ?? [],
-                'created' => $created,
-                'due' => $resource->due_at?->format('M j, Y') ?? 'Not specified',
-                'status' => $resource->status,
-                'orderStatus' => (string) ($payload['order_status'] ?? 'New'),
-                'approvedArtworkId' => (int) data_get($payload, 'documents.0.id', 0),
-            ];
-        })->values();
+        $orderListingData = $orderListing->forCompany((int) $company->id, $request, $initialView === 'orders');
+        $orderPage = $orderListingData['page'];
+        $orders = $orderListingData['rows'];
+        $orderFilters = $orderListingData['filters'];
+        $orderStages = SupplierOrderListing::STAGES;
+        $orderStageCards = $orderListingData['stage_cards'];
         $profile = $company->profile ?? [];
         $maskedBank = $user->role === 'admin' ? ($company->encrypted_banking ?? []) : [];
-        return view('portal.index', compact('user','company','quotations','orders','orderPage','profile','maskedBank','dashboard','realtimeConfig','initialView','notificationType','notificationState','notificationPage'));
+        return view('portal.index', compact('user','company','quotations','orders','orderPage','profile','maskedBank','dashboard','realtimeConfig','initialView','notificationType','notificationState','notificationPage','orderFilters','orderStages','orderStageCards'));
     }
 
     /** Load a single older RFQ on demand; never query outside the logged-in company. */

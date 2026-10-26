@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><meta name="supplier-base-path" content="{{ parse_url(config('app.url'), PHP_URL_PATH) ?: '' }}">@include('portal.partials.flowtrack-favicon')
 <title>{{ $title ?? 'FlowTrack Supplier Portal' }}</title><link rel="stylesheet" href="{{ asset('assets/supplier.css') }}?v={{ filemtime(public_path('assets/supplier.css')) }}">    <link rel="stylesheet" href="{{ asset('assets/supplier-mobile.css') }}?v={{ filemtime(public_path('assets/supplier-mobile.css')) }}">
+<link rel="stylesheet" href="{{ asset('assets/supplier-orders.css') }}?v={{ filemtime(public_path('assets/supplier-orders.css')) }}">
 </head><body><!-- PORTAL VIEW -->
   <section id="portalView">
     <header class="topbar">
@@ -212,31 +213,8 @@
           <!-- Full supplier module views -->
           <section id="view-orders" @class(['app-view', 'hidden' => $initialView !== 'orders'])>
             <div class="page-header"><div><h1>Orders & Requests</h1><p>Orders created in FlowTrack and assigned to your supplier company.</p></div></div>
-            <div class="module-summary-grid">
-              <div class="module-summary-card"><small>ASSIGNED ORDERS</small><strong>{{ $orderPage->total() }}</strong><span>Shared securely with your company</span></div>
-              <div class="module-summary-card"><small>ORDERS ON THIS PAGE</small><strong>{{ $orders->count() }}</strong><span>Read-only order information</span></div>
-              <div class="module-summary-card"><small>ORDER LINES ON THIS PAGE</small><strong>{{ $orders->sum(fn ($order) => count($order['items'])) }}</strong><span>Products included in received orders</span></div>
-              <div class="module-summary-card"><small>LATEST UPDATE</small><strong>{{ $orders->first()['created'] ?? '-' }}</strong><span>Most recently received order</span></div>
-            </div>
-            <div class="table-card"><div class="table-scroll"><table class="compact-table"><thead><tr><th>Order / Product</th><th>Order ref</th><th>Your responsibility</th><th>Required by</th><th>Status</th><th style="text-align:right">Action</th></tr></thead><tbody>
-              @forelse($orders as $order)
-                <tr><td><div class="primary">{{ $order['title'] }}</div><div class="secondary">{{ collect($order['items'])->pluck('product_name')->take(2)->join(', ') }}</div></td><td>{{ $order['reference'] }}</td><td>Assigned products: {{ count($order['items']) }}</td><td>{{ $order['due'] }}</td><td><span class="badge badge-blue">{{ $order['orderStatus'] }}</span></td><td style="text-align:right"><div style="display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap">
-                    @if($order['approvedArtworkId'] > 0)<a class="btn btn-outline-teal btn-sm" href="{{ route('supplier.orders.artwork', [$order['id'], $order['approvedArtworkId']]) }}">Download artwork</a>@endif
-                    <a class="btn btn-outline-teal btn-sm" href="{{ route('supplier.orders.show', $order['id']) }}">View details</a>
-                </div></td></tr>
-              @empty
-                <tr><td colspan="6"><div class="empty-state"><h3>No assigned orders yet</h3><p>Orders will appear here when FlowTrack shares them with your supplier account.</p></div></td></tr>
-              @endforelse
-            </tbody></table></div></div>
-            @if($orderPage->hasPages())
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px">
-                <span>Page {{ $orderPage->currentPage() }} of {{ $orderPage->lastPage() }} · {{ $orderPage->total() }} orders</span>
-                <div style="display:flex;gap:8px">
-                  @if($orderPage->onFirstPage())<span class="btn btn-outline-teal btn-sm" aria-disabled="true">Previous</span>@else<a class="btn btn-outline-teal btn-sm" href="{{ $orderPage->previousPageUrl() }}">Previous</a>@endif
-                  @if($orderPage->hasMorePages())<a class="btn btn-outline-teal btn-sm" href="{{ $orderPage->nextPageUrl() }}">Next</a>@else<span class="btn btn-outline-teal btn-sm" aria-disabled="true">Next</span>@endif
-                </div>
-              </div>
-            @endif
+            @include('portal.partials.orders.stage-cards')
+            @include('portal.partials.orders.list')
           </section>
 
           <section id="view-company-documents" class="app-view hidden">
@@ -411,6 +389,6 @@
   <div id="companyDocModal" class="modal-backdrop hidden"><div class="modal" role="dialog" aria-modal="true" aria-label="Upload company document"><div class="modal-head"><strong>Upload company document</strong><button type="button" class="icon-button" data-close-company-doc aria-label="Close">&times;</button></div><div class="modal-body"><p>Documents stay private to your supplier company.</p><div class="compact-field"><label for="companyDocType">Document category</label><select id="companyDocType"><option>Business registration</option><option>Tax certificate</option><option>Factory audit report</option><option>Bank information</option><option>Quality certification</option><option>Supplier agreement</option><option>Other</option></select></div><div class="compact-field" style="margin-top:12px"><label for="companyDocExpiry">Expiry date (optional)</label><input id="companyDocExpiry" type="date"></div><div class="compact-field" style="margin-top:12px"><label for="companyDocFile">File (PDF, XLSX, DOCX, JPG, PNG; max 20 MB)</label><input id="companyDocFile" type="file" accept=".pdf,.xlsx,.docx,.jpg,.jpeg,.png"></div></div><div class="modal-foot"><button class="btn" type="button" data-close-company-doc>Cancel</button><button class="btn btn-primary" type="button" id="confirmCompanyDoc">Upload securely</button></div></div></div>
 <div id="toast" class="toast hidden"><span class="ok"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg></span><span id="toastText">Saved</span></div>
 
-  <script nonce="{{ request()->attributes->get('csp_nonce') }}">window.supplierPortalConfig = {realtime: {{ Illuminate\Support\Js::from($realtimeConfig) }}, dashboardRevision: {{ Illuminate\Support\Js::from((string) $company->dashboard_revision) }}, rfqActionCount: {{ $dashboard['rfqActionCount'] }}, quotations: {{ Illuminate\Support\Js::from($quotations) }}, companyName: {{ Illuminate\Support\Js::from($company->name) }}, profile: {{ Illuminate\Support\Js::from($profile) }}, banking: {{ Illuminate\Support\Js::from($maskedBank) }}, role: {{ Illuminate\Support\Js::from($user->role) }}};</script><script src="{{ asset('assets/supplier-notifications.js') }}?v={{ filemtime(public_path('assets/supplier-notifications.js')) }}" defer></script><script src="{{ asset('assets/portal.js') }}?v={{ filemtime(public_path('assets/portal.js')) }}" defer></script><script src="{{ asset('assets/supplier-dashboard-realtime.js') }}?v={{ filemtime(public_path('assets/supplier-dashboard-realtime.js')) }}" defer></script><script src="{{ asset('assets/supplier-mobile.js') }}?v={{ filemtime(public_path('assets/supplier-mobile.js')) }}" defer nonce="{{ request()->attributes->get('csp_nonce') }}"></script>
+  <script nonce="{{ request()->attributes->get('csp_nonce') }}">window.supplierPortalConfig = {realtime: {{ Illuminate\Support\Js::from($realtimeConfig) }}, dashboardRevision: {{ Illuminate\Support\Js::from((string) $company->dashboard_revision) }}, rfqActionCount: {{ $dashboard['rfqActionCount'] }}, quotations: {{ Illuminate\Support\Js::from($quotations) }}, companyName: {{ Illuminate\Support\Js::from($company->name) }}, profile: {{ Illuminate\Support\Js::from($profile) }}, banking: {{ Illuminate\Support\Js::from($maskedBank) }}, role: {{ Illuminate\Support\Js::from($user->role) }}};</script><script src="{{ asset('assets/supplier-notifications.js') }}?v={{ filemtime(public_path('assets/supplier-notifications.js')) }}" defer></script><script src="{{ asset('assets/portal.js') }}?v={{ filemtime(public_path('assets/portal.js')) }}" defer></script><script src="{{ asset('assets/supplier-orders.js') }}?v={{ filemtime(public_path('assets/supplier-orders.js')) }}" defer></script><script src="{{ asset('assets/supplier-dashboard-realtime.js') }}?v={{ filemtime(public_path('assets/supplier-dashboard-realtime.js')) }}" defer></script><script src="{{ asset('assets/supplier-mobile.js') }}?v={{ filemtime(public_path('assets/supplier-mobile.js')) }}" defer nonce="{{ request()->attributes->get('csp_nonce') }}"></script>
 <script src="{{ asset('assets/supplier-session.js') }}?v={{ filemtime(public_path('assets/supplier-session.js')) }}" data-activity-url="{{ route('supplier.session.activity') }}" data-logout-url="{{ route('supplier.logout') }}" data-login-url="{{ route('supplier.login') }}" defer></script>
 </body></html>
