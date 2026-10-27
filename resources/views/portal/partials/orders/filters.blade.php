@@ -1,4 +1,9 @@
-<form id="supplierOrderFilters" class="supplier-orders-filter-toolbar" method="GET" action="{{ route('supplier.home') }}" role="search" aria-label="Filter supplier orders">
+@php
+    // The portal is mounted at /supplier/ in production. Submit to that canonical
+    // URL so the web server never redirects /supplier?filters to /supplier/.
+    $ordersBaseUrl = rtrim(route('supplier.home'), '/').'/';
+@endphp
+<form id="supplierOrderFilters" class="supplier-orders-filter-toolbar" method="GET" action="{{ $ordersBaseUrl }}" role="search" aria-label="Filter supplier orders">
     <input type="hidden" name="view" value="orders">
     @if($orderFilters['quick'] !== '')<input type="hidden" name="quick" value="{{ $orderFilters['quick'] }}">@endif
     <label class="supplier-orders-search">
@@ -6,7 +11,7 @@
         <input type="search" name="search" value="{{ $orderFilters['search'] }}" placeholder="Search order, reference or product" autocomplete="off" aria-label="Search order, reference or product">
     </label>
     <div class="supplier-orders-filter-controls">
-        <a href="{{ route('supplier.home', ['view' => 'orders']) }}" class="supplier-orders-filter-chip {{ !$hasOrderFilters ? 'is-active' : '' }}" aria-current="{{ !$hasOrderFilters ? 'true' : 'false' }}">All</a>
+        <a href="{{ $ordersBaseUrl }}?view=orders" class="supplier-orders-filter-chip {{ !$hasOrderFilters ? 'is-active' : '' }}" aria-current="{{ !$hasOrderFilters ? 'true' : 'false' }}">All</a>
         <label class="supplier-orders-filter-chip supplier-orders-hold {{ $orderFilters['hold'] ? 'is-active' : '' }}">
             <input type="checkbox" name="hold" value="1" @checked($orderFilters['hold'])>
             <span>Hold on</span>
@@ -20,7 +25,7 @@
         <label class="supplier-orders-date"><span>From</span><input type="date" name="from" value="{{ $orderFilters['from'] }}" aria-label="Created date from"></label>
         <label class="supplier-orders-date"><span>To</span><input type="date" name="to" value="{{ $orderFilters['to'] }}" min="{{ $orderFilters['from'] }}" aria-label="Created date to"></label>
         @if($hasOrderFilters)
-            <a class="supplier-orders-clear" href="{{ route('supplier.home', ['view' => 'orders']) }}"><span aria-hidden="true">×</span> Clear</a>
+            <a class="supplier-orders-clear" href="{{ $ordersBaseUrl }}?view=orders"><span aria-hidden="true">×</span> Clear</a>
         @else
             <span class="supplier-orders-clear is-disabled" aria-disabled="true"><span aria-hidden="true">×</span> Clear</span>
         @endif

@@ -6,6 +6,7 @@ use App\Models\SupplierCompany;
 use App\Models\SupplierResource;
 use App\Models\SupplierUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 final class SupplierOrderListFiltersTest extends TestCase
@@ -259,6 +260,31 @@ final class SupplierOrderListFiltersTest extends TestCase
         $resource->save();
         $this->get(route('supplier.home', ['view' => 'orders']))
             ->assertOk()->assertSee('Nov 4, 2026')->assertSee('33%');
+    }
+
+    public function test_orders_filter_links_keep_the_canonical_mount_slash_and_query_parameters(): void
+    {
+        [$company, $user] = $this->supplier('A');
+        for ($i = 1; $i <= 11; $i++) {
+            $this->order($company, sprintf('ORDER-2026-%04d', $i), 'Test Shirt', [
+                'stage_sequence' => 3,
+            ]);
+        }
+
+        // In production the portal runs under /supplier/. URLs without the
+        // trailing slash are redirected by the host and can lose GET filters.
+        URL::forceRootUrl('https://supplier.example.test/supplier');
+        try {
+            $this->actingAs($user)->get('/?view=orders')
+                ->assertOk()
+                ->assertSee('action="https://supplier.example.test/supplier/"', false)
+                ->assertSee('href="https://supplier.example.test/supplier/?view=orders"', false)
+                ->assertSee('href="https://supplier.example.test/supplier/?view=orders&amp;stage=3"', false)
+                ->assertSee('https://supplier.example.test/supplier/?view=orders&amp;orders_page=2', false)
+                ->assertDontSee('action="https://supplier.example.test/supplier"', false);
+        } finally {
+            URL::forceRootUrl(null);
+        }
     }
 
     public function test_legacy_orders_remain_visible_until_synced(): void

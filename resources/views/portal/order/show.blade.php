@@ -50,14 +50,14 @@
         <div class="supplier-prototype-content">
             <div class="supplier-prototype-breadcrumb-row">
                 <div class="supplier-prototype-breadcrumbs">
-                    <a href="{{ route('supplier.home') }}?view=orders">Orders</a>
+                    <a href="{{ rtrim(route('supplier.home'), '/').'/' }}?view=orders">Orders</a>
                     <span>/</span>
                     <strong>{{ $summary['breadcrumb_reference'] }}</strong>
                     <button type="button" class="supplier-prototype-copy-btn" aria-label="Copy order reference" data-copy-reference="{{ $summary['breadcrumb_reference'] }}">
                         @include('portal.order.partials.svg.copy')
                     </button>
                 </div>
-                <a href="{{ route('supplier.home') }}?view=orders" class="supplier-prototype-back-btn">
+                <a href="{{ rtrim(route('supplier.home'), '/').'/' }}?view=orders" class="supplier-prototype-back-btn">
                     @include('portal.order.partials.svg.arrow-left')
                     <span>Back to orders</span>
                 </a>

@@ -35,7 +35,7 @@ final class SupplierPortalNavigationTest extends TestCase
         ]);
 
         $details = $this->actingAs($user)->get(route('supplier.orders.show', $order->id))->assertOk();
-        $details->assertSee(route('supplier.home').'?view=orders', false);
+        $details->assertSee(rtrim(route('supplier.home'), '/').'/?view=orders', false);
 
         $orders = $this->get(route('supplier.home', ['view' => 'orders']))->assertOk();
         $orders->assertSee('ORD-NAV');

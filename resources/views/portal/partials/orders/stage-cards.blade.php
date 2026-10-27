@@ -19,7 +19,7 @@
                     ], static fn ($value) => $value !== '');
                     $label = $isQuick ? $stage['name'] : $stage['name'].' stage';
                 @endphp
-                <a href="{{ route('supplier.home', $query) }}"
+                <a href="{{ rtrim(route('supplier.home'), '/').'/' }}?{{ http_build_query($query) }}"
                    class="supplier-order-stage-card {{ $selected ? 'is-selected' : '' }}"
                    style="--supplier-stage:{{ $stage['color'] }}"
                    aria-label="{{ $selected ? 'Clear' : 'Filter by' }} {{ $label }}, {{ number_format($stage['count']) }} {{ $stage['count'] === 1 ? 'order' : 'orders' }}"

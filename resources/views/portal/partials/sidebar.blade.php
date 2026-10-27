@@ -28,7 +28,7 @@
         @if($isStandalone)</a>@else</button>@endif
 
         @if($isStandalone)
-            <a class="nav-item {{ $isOrderDetail ? 'active' : '' }}" @if($isOrderDetail)aria-current="page"@endif href="{{ route('supplier.home') }}?view=orders">
+            <a class="nav-item {{ $isOrderDetail ? 'active' : '' }}" @if($isOrderDetail)aria-current="page"@endif href="{{ rtrim(route('supplier.home'), '/').'/' }}?view=orders">
         @else
             <button class="nav-item {{ $initialView === 'orders' ? 'active' : '' }}" data-view="orders" type="button">
         @endif

@@ -159,7 +159,7 @@ final class SupplierOrderListing
         }
         $page = $query->orderByDesc('id')->paginate(10, [
             'id', 'external_reference', 'status', 'payload', 'due_at', 'created_at',
-        ], 'orders_page')->appends(array_filter([
+        ], 'orders_page')->withPath(rtrim(route('supplier.home'), '/').'/')->appends(array_filter([
             'view' => 'orders',
             'search' => $filters['search'],
             'hold' => $filters['hold'] ? '1' : '',
