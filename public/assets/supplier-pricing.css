@@ -104,9 +104,11 @@
 .pricing-edit-table td,.pricing-details-table td{height:47px;padding:6px 14px;border-bottom:1px solid #e7ebf2;vertical-align:middle;font-size:12.5px;font-variant-numeric:tabular-nums}
 .pricing-edit-table tbody tr:last-child td,.pricing-details-table tbody tr:last-child td{border-bottom:0}
 .pricing-tier-quantity{font-weight:550;color:#1d3354;white-space:nowrap}
+/* Keep hidden approved-tier quantities unchanged; make editable new-tier quantities visible. */
 .pricing-tier-quantity .pricing-quantity-input{font-weight:550;border:0;background:transparent;border-radius:0;padding:0;color:#1d3354;width:100%;min-height:24px;height:28px;box-shadow:none;appearance:textfield;-moz-appearance:textfield}
 .pricing-quantity-input::-webkit-inner-spin-button,.pricing-quantity-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.pricing-tier-quantity .pricing-quantity-input:not(:disabled):focus{background:#effaf8;outline:1px solid #51bba8;padding:0 4px;border-radius:4px}
+.pricing-tier-quantity .pricing-quantity-input[type="number"]{display:block;width:100%;max-width:220px;min-height:33px;height:33px;box-sizing:border-box;padding:4px 11px;border:1px solid #cdd9e9;border-radius:6px;background:#fff;color:#1d3352;font-size:12.5px}
+.pricing-tier-quantity .pricing-quantity-input[type="number"]:not(:disabled):focus{padding:4px 11px;border-color:#51bba8;background:#effaf8;outline:2px solid rgba(81,187,168,.2);outline-offset:0}
 .pricing-current-value{color:#243b58;font-weight:500;white-space:nowrap}
 .pricing-edit-table input.pricing-new-price{height:33px;min-height:33px;border:1px solid #cdd9e9;border-radius:6px;padding:4px 11px;color:#1d3352;font-size:12.5px;font-variant-numeric:tabular-nums;width:100%;max-width:220px}
 .pricing-edit-table input.pricing-new-price.is-modified{background:#eafaf6;border-color:#73d6c4}
