@@ -32,8 +32,17 @@ final class SupplierWorkflowActionController extends Controller
                 }
             }
         }
-        abort_unless($taskData && ($taskData['can_act'] ?? false) && ($taskData['assigned_to_supplier'] ?? false), 403);
-        $key = (string) ($taskData['action_key'] ?? '');
+        // QC evidence is a separate task-document action. A supplier can add
+        // files to its QC task while the QC phase is current, even while the
+        // QC check waits for issue resolution. It never completes the task.
+        $isQcAttachment = $request->input('decision') === 'attach'
+            && $taskData && ($taskData['assigned_to_supplier'] ?? false)
+            && ($taskData['can_attach'] ?? false)
+            && in_array((string) ($taskData['document_action_key'] ?? ''), ['QC_CHECK', 'QC_ISSUE'], true);
+        abort_unless($taskData && ($taskData['assigned_to_supplier'] ?? false)
+            && (($taskData['can_act'] ?? false) || $isQcAttachment), 403);
+        $key = $isQcAttachment ? (string) $taskData['document_action_key']
+            : (string) ($taskData['action_key'] ?? '');
         // Old browser snapshots must not regain buyer-only date-setting actions.
         abort_if($key === 'PROD_SET_ESTIMATED_DELIVERY', 403);
         foreach (['estimated_delivery_date', 'supplier_delivery_date', 'shipment_date'] as $dateField) {
@@ -52,6 +61,7 @@ final class SupplierWorkflowActionController extends Controller
             'qty_inspected' => ['nullable', 'integer', 'min:0'],
             'qty_accepted' => ['nullable', 'integer', 'min:0'],
             'qty_rejected' => ['nullable', 'integer', 'min:0'],
+            'qc_comments' => ['nullable', 'string', 'max:2000'],
             'issue_category' => ['nullable', 'string', 'max:100'],
             'erp_reference' => ['nullable', 'string', 'max:150'],
             'carrier' => ['nullable', 'string', 'max:150'],
@@ -69,13 +79,49 @@ final class SupplierWorkflowActionController extends Controller
             'revision_document_ids.*' => ['integer', 'min:1', 'distinct'],
             'revision_notes' => ['sometimes', 'array', 'max:20'],
             'revision_notes.*' => ['nullable', 'string', 'max:2000'],
-            'files' => [$isDocumentTask ? 'required' : 'sometimes', 'array', 'max:5'],
+            'files' => [($isDocumentTask || $isQcAttachment) ? 'required' : 'sometimes', 'array', 'max:5'],
             'files.*' => ['file', 'max:'.$maxKb, function ($attribute, $value, $fail) use ($allowedExtensions) {
                 if (! in_array(strtolower((string) $value->getClientOriginalExtension()), $allowedExtensions, true)) {
                     $fail('Unsupported task attachment format.');
                 }
             }],
         ]);
+        // Validate supplier QC before calling FlowTracker. The buyer repeats the
+        // canonical rules inside OrderWorkflowActionService under the task lock.
+        if (in_array($key, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT'], true)) {
+            $allowed = $isQcAttachment ? ['attach'] : match ($key) {
+                'QC_CHECK' => ['pass', 'issue'],
+                'QC_ISSUE' => ['resolve'],
+                default => ['confirm'],
+            };
+            if (! in_array($validated['decision'], $allowed, true)) {
+                throw ValidationException::withMessages(['decision' => 'This QC action is not available. Refresh the order.']);
+            }
+            if (! $isQcAttachment && $request->hasFile('files')) {
+                throw ValidationException::withMessages(['files' => 'Attach QC documents separately from a QC decision.']);
+            }
+            if ($key === 'QC_CHECK' && ! $isQcAttachment) {
+                $received = (int) ($validated['qty_received'] ?? 0);
+                $inspected = (int) ($validated['qty_inspected'] ?? 0);
+                $accepted = (int) ($validated['qty_accepted'] ?? 0);
+                $rejected = (int) ($validated['qty_rejected'] ?? 0);
+                $errors = [];
+                if ($received <= 0) $errors['qty_received'] = 'Quantity received is required.';
+                if ($inspected <= 0) $errors['qty_inspected'] = 'Quantity inspected is required.';
+                if ($received > 0 && $inspected > 0
+                    && ($inspected > $received || $accepted + $rejected > $inspected)) {
+                    $errors['qty_inspected'] = 'QC quantities are inconsistent.';
+                }
+                if ($errors !== []) throw ValidationException::withMessages($errors);
+            }
+            if (! $isQcAttachment && (($key === 'QC_CHECK' && $validated['decision'] === 'issue') || $key === 'QC_ISSUE')) {
+                if (trim((string) ($validated['comment'] ?? '')) === '') {
+                    throw ValidationException::withMessages(['comment' => $key === 'QC_CHECK'
+                        ? 'Describe the QC issue before reporting it.'
+                        : 'Add the resolution before closing this issue.']);
+                }
+            }
+        }
         // Match FlowTracker's two-step client-artwork decision. Submitting
         // ERP upload does not approve the client's artwork or complete the task.
         if ($key === 'ART_CLIENT_ERP_DECISION') {
@@ -124,6 +170,9 @@ final class SupplierWorkflowActionController extends Controller
         if (! $isDocumentTask && $validated['decision'] === 'upload') {
             throw ValidationException::withMessages(['workflow' => 'This task cannot be completed as an upload action.']);
         }
+        if ($isQcAttachment && $files === []) {
+            throw ValidationException::withMessages(['files' => 'Choose at least one QC document.']);
+        }
         $url = rtrim((string) config('flowtrack_bridge.buyer_url'), '/');
         $secret = (string) config('flowtrack_bridge.secret');
         $host = parse_url($url, PHP_URL_HOST);
@@ -135,14 +184,19 @@ final class SupplierWorkflowActionController extends Controller
                 && in_array($host, ['localhost', '127.0.0.1'], true))), 503);
         $event = (string) Str::uuid();
         $inputKeys = [
-            'qty_received', 'qty_inspected', 'qty_accepted', 'qty_rejected',
+            'qty_received', 'qty_inspected', 'qty_accepted', 'qty_rejected', 'qc_comments',
             'issue_category', 'erp_reference', 'carrier', 'tracking_number',
             'client_name', 'contact_name', 'phone_country_code', 'phone_number',
             'address', 'city', 'state', 'country', 'postal_code',
         ];
         $payload = [];
         foreach ($inputKeys as $field) {
-            if (isset($validated[$field]) && $validated[$field] !== '') $payload[$field] = $validated[$field];
+            if (isset($validated[$field]) && $validated[$field] !== '') {
+                // HTML number fields arrive as strings; store canonical QC counts.
+                $payload[$field] = $key === 'QC_CHECK' && in_array($field,
+                    ['qty_received', 'qty_inspected', 'qty_accepted', 'qty_rejected'], true)
+                    ? (int) $validated[$field] : $validated[$field];
+            }
         }
         if ($sourceIds !== []) $payload['file_source_ids'] = $sourceIds;
         if ($selectedArtwork !== []) {
@@ -205,7 +259,9 @@ final class SupplierWorkflowActionController extends Controller
                 403, 404 => 'This task is no longer assigned to your company.',
                 409 => 'Task state changed in FlowTracker. Wait for synchronization and refresh.',
                 413 => 'The file is too large for the configured server upload limit.',
-                422 => 'FlowTracker rejected the task details or evidence. Check required fields and attachments.',
+                422 => in_array($key, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT'], true)
+                    ? 'FlowTracker rejected the QC action. Check the quantities and required issue or resolution description.'
+                    : 'FlowTracker rejected the task details or evidence. Check required fields and attachments.',
                 default => 'FlowTracker did not accept the action. Please try again later.',
             }]);
         }
@@ -247,6 +303,13 @@ final class SupplierWorkflowActionController extends Controller
                 => 'Client sample requirement recorded in FlowTracker. The Sample Approval task is the next step.',
             $key === 'ART_CLIENT_ERP_DECISION' && $validated['decision'] === 'revise'
                 => 'Client revision request recorded in FlowTracker. The artwork revision workflow has restarted.',
+            $isQcAttachment => 'QC document saved on the assigned FlowTracker task.',
+            $key === 'QC_CHECK' && $validated['decision'] === 'issue'
+                => 'QC issue recorded in FlowTracker. Resolve the QC issue before shipment approval.',
+            $key === 'QC_ISSUE' && $validated['decision'] === 'resolve'
+                => 'QC issue resolved in FlowTracker. The waiting QC check has been completed.',
+            $key === 'QC_CHECK' && $validated['decision'] === 'pass'
+                => 'QC passed and recorded in FlowTracker.',
             $savedStatus === 'completed' || $validated['decision'] === 'confirm'
                 => 'Task action accepted and recorded in FlowTracker.',
             default => 'Task action accepted by FlowTracker.',

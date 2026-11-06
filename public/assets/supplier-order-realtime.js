@@ -25,6 +25,7 @@
     var pingTimer;
     var lastHeartbeat = 0;
     var reconnectTimer;
+    var lastRevisionCheck = 0;
 
     function safeToRefresh() {
         return !document.hidden && !document.querySelector('dialog[open]') &&
@@ -35,7 +36,11 @@
     }
     async function checkRevision() {
         if (checking) { queuedCheck = true; return; }
-        if (document.hidden || !revisionUrl) return;
+        if (document.hidden || !revisionUrl || refreshPending) return;
+        // Tab/window focus and Reverb can fire together; coalesce those hints
+        // into one company-scoped revision lookup, never a full order reload.
+        if (Date.now() - lastRevisionCheck < 1500) return;
+        lastRevisionCheck = Date.now();
         checking = true;
         try {
             var response = await fetch(revisionUrl, {
@@ -120,7 +125,18 @@
         if (!document.hidden) { refreshIfReady(); checkRevision(); }
     });
     document.addEventListener('close', refreshIfReady, true);
-    window.addEventListener('focus', refreshIfReady);
+    window.addEventListener('focus', function () {
+        refreshIfReady();
+        if (!refreshPending) checkRevision();
+    });
+    // Right after a confirmed supplier action, the canonical FlowTracker save
+    // can precede queued projection delivery. A bounded, action-only refresh
+    // avoids showing a stale locked QC resolution task until the next minute.
+    if (config.orderRealtimeActionPending === '1') {
+        [1800, 5000].forEach(function (delay) {
+            setTimeout(function () { if (!closed && !refreshPending) checkRevision(); }, delay);
+        });
+    }
     window.addEventListener('beforeunload', function () {
         closed = true; clearInterval(pingTimer); disconnect();
     });

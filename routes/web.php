@@ -55,6 +55,7 @@ Route::middleware(['auth',EnforceSupplierSessionTimeout::class,EnsureSupplierAct
     Route::post('/orders/{id}/workflow/tasks/{task}/action', \App\Http\Controllers\SupplierWorkflowActionController::class)
         ->whereNumber('id')->whereNumber('task')->middleware('throttle:10,1')->name('supplier.orders.workflow.action');
     Route::get('/orders/{id}/artwork/{document}', \App\Http\Controllers\SupplierOrderArtworkController::class)->whereNumber('id')->whereNumber('document')->middleware('throttle:30,1')->name('supplier.orders.artwork');
+    Route::get('/orders/{id}/qc-documents/{document}', \App\Http\Controllers\SupplierOrderQcDocumentController::class)->whereNumber('id')->whereNumber('document')->middleware('throttle:30,1')->name('supplier.orders.qc-document');
     Route::post('/logout',[AuthController::class,'logout'])->name('supplier.logout');
     // These signed-bridge task actions must not consume the dashboard's
     // shared API throttle bucket (nor other RFQ actions' per-user quota).

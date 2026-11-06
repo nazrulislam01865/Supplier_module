@@ -12,6 +12,7 @@
             <tr class="supplier-order-row {{ $order['hold'] ? 'is-on-hold' : '' }}" style="--supplier-order-accent:{{ $rowAccent }}" data-supplier-order-href="{{ $detailsUrl }}" tabindex="0" aria-label="Open order {{ $order['reference'] }}">
                 <td data-label="Order">
                     <a class="supplier-order-ref" href="{{ $detailsUrl }}">{{ $order['reference'] }}</a>
+                    @if($order['is_redo'])<span class="supplier-redo-badge">Redo order</span>@endif
                     <span class="supplier-order-subline">{{ $order['created'] }}</span>
                     @if($order['hold'])<span class="supplier-order-hold-label">Ⅱ On Hold</span>@endif
                 </td>

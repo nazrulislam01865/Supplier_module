@@ -97,3 +97,41 @@
 #supplierOrderView .supplier-flow-delivery-target{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:0 14px 12px;padding:10px 12px;border:1px solid #b8dfd7;background:#eef8f5;border-radius:7px;color:#315e59;font-size:12px;line-height:1.5}
 #supplierOrderView .supplier-flow-delivery-target strong{font-size:14px;color:#087a69}
 #supplierOrderView .supplier-flow-delivery-target small{color:#56827a;font-size:11px}
+
+/* FlowTracker-parity QC dialog: two-step pass/report, followed by issue details. */
+#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog]{width:min(740px,calc(100vw - 28px));max-height:min(90dvh,920px)}
+#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-dialog-head{padding:24px 30px 21px}
+#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-dialog-head h4{font-size:22px;line-height:1.25}
+#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-dialog-head p{font-size:13px}
+#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-action-form{padding:26px 30px 28px;gap:20px}
+#supplierOrderView .supplier-flow-qc-step{display:flex;flex-direction:column;gap:22px}
+#supplierOrderView .supplier-flow-qc-step[hidden]{display:none}
+#supplierOrderView .supplier-flow-qc-step label{font-size:12px;letter-spacing:.065em;text-transform:uppercase;font-weight:800;gap:9px;color:#526881}
+#supplierOrderView .supplier-flow-qc-step :is(input,textarea,select){letter-spacing:normal;text-transform:none;font-weight:500;color:#172b44}
+#supplierOrderView .supplier-flow-qc-step textarea{min-height:100px}
+#supplierOrderView .supplier-flow-qc-step .supplier-flow-quantities{gap:18px 20px}
+#supplierOrderView .supplier-flow-qc-step .supplier-flow-quantities input{min-height:53px;font-size:17px}
+#supplierOrderView .supplier-flow-qc-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:4px}
+#supplierOrderView .supplier-flow-qc-choice{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border:1px solid #d3e1ec;border-radius:13px;min-height:155px;padding:19px 10px;background:#fff;color:#172b44;cursor:pointer;font:inherit}
+#supplierOrderView .supplier-flow-qc-choice:is(:hover,:focus-visible){border-color:#008e80;background:#effaf7;outline:2px solid #008e80;outline-offset:1px}
+#supplierOrderView .supplier-flow-qc-choice-icon{display:grid;place-items:center;width:44px;height:44px;background:#e3f5ee;color:#008978;border-radius:50%;font-size:25px;font-weight:850}
+#supplierOrderView .supplier-flow-qc-choice--issue .supplier-flow-qc-choice-icon{background:#feecef;color:#c72c36}
+#supplierOrderView .supplier-flow-qc-choice strong{font-size:17px;font-weight:850}
+#supplierOrderView .supplier-flow-qc-choice small{font-size:12px;color:#6c829c;text-align:center}
+#supplierOrderView .supplier-flow-qc-file-note,#supplierOrderView .supplier-flow-qc-email-note{border:1px dashed #a9cfc8;border-radius:10px;background:#f5faf9;padding:15px 17px;display:flex;flex-direction:column;gap:7px;color:#375b55;font-size:12px;line-height:1.5}
+#supplierOrderView .supplier-flow-qc-email-note{border-style:solid;border-color:#d7e3ef;background:#f6f9fb;color:#536980}
+#supplierOrderView .supplier-flow-qc-file-note strong,#supplierOrderView .supplier-flow-qc-email-note strong{font-size:12px;color:#294c4a}
+#supplierOrderView .supplier-flow-qc-report-submit{background:#fff3f3;border:1px solid #f5b4ba;color:#bc272c}
+#supplierOrderView .supplier-flow-qc-report-submit:hover{background:#fde6e6}
+@media(max-width:580px){#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-dialog-head{padding:18px}#supplierOrderView .supplier-flow-dialog[data-supplier-qc-dialog] .supplier-flow-action-form{padding:18px}#supplierOrderView .supplier-flow-qc-choices{gap:9px}#supplierOrderView .supplier-flow-qc-choice{min-height:136px}#supplierOrderView .supplier-flow-qc-step .supplier-flow-quantities{gap:10px}}
+
+/* A task's QC Document follows FlowTracker's separate evidence control. */
+.supplier-flow-qc-document-link{display:block;margin-top:7px;padding:0;border:0;background:transparent;color:#57718d;font:inherit;font-size:12px;cursor:pointer;text-align:left}
+.supplier-flow-qc-document-link:hover{text-decoration:underline;color:#007f75}
+.supplier-flow-qc-existing-file{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #e4eaf0;overflow-wrap:anywhere}
+.supplier-flow-qc-existing-file a{color:#006f65;text-decoration:underline}
+.supplier-flow-qc-existing-file small{white-space:nowrap;color:#64748b}
+
+#supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-dialog-body{padding:18px 22px 22px}
+#supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-action-form{padding:16px 0 0}
+#supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-dialog-actions{margin-top:16px}

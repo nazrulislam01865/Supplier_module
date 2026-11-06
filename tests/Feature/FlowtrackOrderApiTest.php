@@ -35,9 +35,9 @@ class FlowtrackOrderApiTest extends TestCase
         $event = 'c09541f5-1bc7-4564-abd6-0d40ec325d21';
         return [
             'CONTENT_TYPE' => 'application/json',
-            'X-FlowTrack-Timestamp' => $timestamp,
-            'X-FlowTrack-Event' => $event,
-            'X-FlowTrack-Signature' => hash_hmac('sha256', $timestamp."\n".$event."\n".$body, 'test-bridge-secret-at-least-32-characters'),
+            'HTTP_X_FLOWTRACK_TIMESTAMP' => $timestamp,
+            'HTTP_X_FLOWTRACK_EVENT' => $event,
+            'HTTP_X_FLOWTRACK_SIGNATURE' => hash_hmac('sha256', $timestamp."\n".$event."\n".$body, 'test-bridge-secret-at-least-32-characters'),
         ];
     }
 
@@ -160,9 +160,11 @@ class FlowtrackOrderApiTest extends TestCase
         $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)->assertOk();
         $saved->refresh();
         $this->assertSame('Production · Completed', $saved->payload['recent_updates'][0]['title']);
+        // Legacy skipped tasks remain in the received snapshot; the detail page
+        // displays the canonical workflow, not the legacy stages task list.
+        $this->assertSame('skipped', $saved->payload['stages'][0]['tasks'][1]['status']);
         $this->actingAs($user)->get('/orders/'.$saved->id)
             ->assertOk()->assertSee('£2.75')->assertSee('£550.00')
-            ->assertSee('Sample approval')->assertSee('Skipped')
             ->assertSee('Artwork approved')->assertSee('V3')
             ->assertDontSee('Overall status')->assertDontSee('Reference number')
             ->assertDontSee('Shipping address');
@@ -281,7 +283,213 @@ class FlowtrackOrderApiTest extends TestCase
         $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
             ->assertOk()->assertJsonPath('applied', false);
         $this->assertSame(2, $saved->fresh()->payload['workflow']['current_phase_id']);
+
+        // Empty task lists are legitimate, but the field must still be present.
+        $missingTasks = $data;
+        $missingTasks['order']['revision'] = 250;
+        unset($missingTasks['order']['workflow']['stages'][0]['tasks']);
+        $body = json_encode($missingTasks, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertUnprocessable();
+        $this->assertSame(200, $saved->fresh()->payload['revision']);
     }
 
 
+
+    public function test_redo_metadata_is_supplier_scoped_validated_and_rendered_without_customer_financial_data(): void
+    {
+        config()->set('flowtrack_bridge.enabled', true);
+        config()->set('flowtrack_bridge.secret', 'test-bridge-secret-at-least-32-characters');
+        $company = SupplierCompany::create([
+            'reference' => 'REDO101', 'name' => 'Redo Supplier', 'active' => true,
+            'flowtrack_supplier_id' => 101,
+        ]);
+        $other = SupplierCompany::create([
+            'reference' => 'REDO202', 'name' => 'Other Supplier', 'active' => true,
+            'flowtrack_supplier_id' => 202,
+        ]);
+        $user = SupplierUser::create([
+            'supplier_company_id' => $company->id, 'name' => 'Redo User',
+            'email' => 'redo-supplier@example.test', 'password' => 'LongValidPassword12', 'active' => true,
+        ]);
+        $outsider = SupplierUser::create([
+            'supplier_company_id' => $other->id, 'name' => 'Other User',
+            'email' => 'redo-other@example.test', 'password' => 'LongValidPassword12', 'active' => true,
+        ]);
+        $data = $this->data(101);
+        $data['order']['reference'] = 'ORDER-2026-0099-R1';
+        $data['order']['revision'] = 100;
+        $data['order']['redo'] = [
+            'original_reference' => 'ORDER-2026-0099',
+            'scope' => 'production',
+            'issue_category' => 'Stitching',
+            'issue_description' => 'Replace damaged stitching. <script>alert(1)</script>',
+            'affected_quantity' => 12,
+            'redo_quantity' => 10,
+            'supplier_adjustment' => [
+                'type' => 'percent', 'value' => 12.5,
+                'charge' => 250.75, 'freight' => 35.5, 'courier_freight' => 12.5,
+                'total_recovery' => 286.25,
+            ],
+            // Untrusted keys are always dropped at the receiver.
+            'customer_impact' => 12345,
+            'supplier_adjustment_value' => 99,
+            'internal_instructions' => 'PRIVATE REDO INSTRUCTIONS',
+        ];
+        $body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk()->assertJsonPath('applied', true);
+
+        $order = SupplierResource::query()->where('supplier_company_id', $company->id)->firstOrFail();
+        $this->assertSame('ORDER-2026-0099', $order->payload['redo']['original_reference']);
+        $this->assertSame(10, $order->payload['redo']['redo_quantity']);
+        $this->assertSame('percent', $order->payload['redo']['supplier_adjustment']['type']);
+        $this->assertSame(12.5, $order->payload['redo']['supplier_adjustment']['value']);
+        $this->assertSame(250.75, $order->payload['redo']['supplier_adjustment']['charge']);
+        $this->assertSame(35.5, $order->payload['redo']['supplier_adjustment']['freight']);
+        $this->assertSame(12.5, $order->payload['redo']['supplier_adjustment']['courier_freight']);
+        $this->assertSame(286.25, $order->payload['redo']['supplier_adjustment']['total_recovery']);
+        $this->assertArrayNotHasKey('customer_impact', $order->payload['redo']);
+        $this->assertArrayNotHasKey('supplier_adjustment_value', $order->payload['redo']);
+        $this->assertArrayNotHasKey('internal_instructions', $order->payload['redo']);
+
+        $this->actingAs($outsider)->get('/orders/'.$order->id)->assertNotFound();
+        $this->actingAs($user)->get('/orders/'.$order->id)
+            ->assertOk()->assertSee('Redo details')->assertSee('Original order')
+            ->assertSee('Production only')->assertSee('Replace damaged stitching')
+            ->assertDontSee('<script>', false)->assertDontSee('PRIVATE REDO INSTRUCTIONS')
+            ->assertDontSee('12345')
+            ->assertSee('Supplier financial impact')->assertSee('Supplier · 12.5%')
+            ->assertSee('$250.75')->assertSee('$35.50')->assertSee('$12.50')->assertSee('$286.25')
+            ->assertDontSee('Customer ·')->assertDontSee('Affected value');
+        $this->actingAs($user)->get('/?view=orders')->assertOk()->assertSee('Redo order');
+
+        // Older signed snapshots cannot erase a newer redo summary.
+        $stale = $data;
+        $stale['order']['revision'] = 99;
+        unset($stale['order']['redo']);
+        $body = json_encode($stale, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk()->assertJsonPath('applied', false);
+        $this->assertArrayHasKey('redo', $order->fresh()->payload);
+        $this->assertSame(286.25, $order->fresh()->payload['redo']['supplier_adjustment']['total_recovery']);
+    }
+
+    public function test_incomplete_or_financial_only_redo_projection_is_rejected(): void
+    {
+        config()->set('flowtrack_bridge.enabled', true);
+        config()->set('flowtrack_bridge.secret', 'test-bridge-secret-at-least-32-characters');
+        SupplierCompany::create([
+            'reference' => 'REDO101', 'name' => 'Redo Supplier', 'active' => true,
+            'flowtrack_supplier_id' => 101,
+        ]);
+        $data = $this->data(101);
+        $data['order']['redo'] = [
+            'original_reference' => 'ORDER-2026-0099',
+            'scope' => 'discount',
+            'issue_category' => 'Wrong color',
+            'affected_quantity' => 5,
+            // Missing redo quantity, and discount isn't a production redo.
+        ];
+        $body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertUnprocessable();
+        $this->assertSame(0, SupplierResource::query()->count());
+    }
+
+    public function test_redo_supplier_adjustment_in_pieces_is_displayed_and_invalid_adjustment_is_rejected(): void
+    {
+        config()->set('flowtrack_bridge.enabled', true);
+        config()->set('flowtrack_bridge.secret', 'test-bridge-secret-at-least-32-characters');
+        $company = SupplierCompany::create([
+            'reference' => 'PCS101', 'name' => 'Piece Supplier', 'active' => true,
+            'flowtrack_supplier_id' => 101,
+        ]);
+        $user = SupplierUser::create([
+            'supplier_company_id' => $company->id, 'name' => 'Piece User',
+            'email' => 'redo-pieces@example.test', 'password' => 'LongValidPassword12', 'active' => true,
+        ]);
+        $data = $this->data(101);
+        $data['order']['redo'] = [
+            'original_reference' => 'ORDER-2026-0098',
+            'scope' => 'artwork', 'issue_category' => 'Wrong size',
+            'issue_description' => 'Redo two pieces',
+            'affected_quantity' => 12, 'redo_quantity' => 10,
+            'supplier_adjustment' => [
+                'type' => 'pcs', 'value' => 2,
+                'charge' => 30.25, 'freight' => 0, 'total_recovery' => 30.25,
+            ],
+        ];
+        $body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk()->assertJsonPath('applied', true);
+
+        $resource = SupplierResource::query()->where('supplier_company_id', $company->id)->firstOrFail();
+        $this->actingAs($user)->get('/orders/'.$resource->id)
+            ->assertOk()->assertSee('2 pcs')->assertSee('$30.25')
+            ->assertSee('Courier company freight deduction')->assertSee('Not applicable');
+
+        $invalid = $data;
+        $invalid['order']['revision'] = 200;
+        unset($invalid['order']['redo']['supplier_adjustment']['charge']);
+        $body = json_encode($invalid, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertUnprocessable();
+        $this->assertSame(30.25, $resource->fresh()->payload['redo']['supplier_adjustment']['total_recovery']);
+
+        $invalid['order']['redo']['supplier_adjustment']['charge'] = -1;
+        $body = json_encode($invalid, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertUnprocessable();
+
+        $zero = $data;
+        $zero['order']['revision'] = 300;
+        $zero['order']['redo']['supplier_adjustment'] = [
+            'type' => 'percent', 'value' => 40,
+            'charge' => 0.0, 'freight' => 0.0, 'courier_freight' => 0.0, 'total_recovery' => 0.0,
+        ];
+        $body = json_encode($zero, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk()->assertJsonPath('applied', true);
+        $this->actingAs($user)->get('/orders/'.$resource->id)
+            ->assertOk()->assertSee('Supplier · 40%')->assertSee('$0.00')
+            ->assertSee('Not applicable')->assertSee('Total supplier recovery')
+            ->assertDontSee('Customer ·');
+        // JSON storage may decode 0.0 as integer 0; both represent valid zero money.
+        $savedAdjustment = $resource->fresh()->payload['redo']['supplier_adjustment'];
+        $this->assertArrayHasKey('charge', $savedAdjustment);
+        $this->assertSame(0.0, (float) $savedAdjustment['charge']);
+        $this->assertSame(0.0, (float) $savedAdjustment['total_recovery']);
+
+        $invalidCourier = $zero;
+        $invalidCourier['order']['revision'] = 400;
+        $invalidCourier['order']['redo']['supplier_adjustment']['courier_freight'] = -1;
+        $body = json_encode($invalidCourier, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertUnprocessable();
+        $this->assertSame(300, $resource->fresh()->payload['revision']);
+    }
+
+    public function test_normal_order_does_not_show_redo_ui_or_require_redo_metadata(): void
+    {
+        config()->set('flowtrack_bridge.enabled', true);
+        config()->set('flowtrack_bridge.secret', 'test-bridge-secret-at-least-32-characters');
+        $company = SupplierCompany::create([
+            'reference' => 'NORMAL101', 'name' => 'Normal Supplier', 'active' => true,
+            'flowtrack_supplier_id' => 101,
+        ]);
+        $user = SupplierUser::create([
+            'supplier_company_id' => $company->id, 'name' => 'Normal User',
+            'email' => 'normal-supplier@example.test', 'password' => 'LongValidPassword12', 'active' => true,
+        ]);
+        $data = $this->data(101);
+        $body = json_encode($data, JSON_THROW_ON_ERROR);
+        $this->call('POST', '/api/v1/integrations/flowtrack/orders', [], [], [], $this->headers($body), $body)
+            ->assertOk();
+        $order = SupplierResource::query()->where('supplier_company_id', $company->id)->firstOrFail();
+        $this->assertArrayNotHasKey('redo', $order->payload);
+        $this->actingAs($user)->get('/orders/'.$order->id)
+            ->assertOk()->assertDontSee('Redo details')->assertDontSee('Redo order');
+        $this->actingAs($user)->get('/?view=orders')->assertOk()->assertDontSee('Redo order');
+    }
 }

@@ -12,6 +12,7 @@
 </head>
 <body id="supplierOrderView" class="supplier-prototype-body"
     data-order-realtime-id="{{ $order->id }}"
+    data-order-realtime-action-pending="{{ session('success') ? '1' : '0' }}"
     data-order-realtime-revision="{{ (string) ($order->payload['revision'] ?? '0') }}"
     data-order-realtime-supplier="{{ (int) $company->flowtrack_supplier_id }}"
     data-order-realtime-source="{{ (int) ($order->payload['source_id'] ?? 0) }}"
@@ -65,7 +66,46 @@
 
             <header class="supplier-prototype-header">
                 <h1>{{ $summary['title'] }}</h1>
+                @if($redo)<span class="supplier-redo-badge">Redo order</span>@endif
             </header>
+            @if($redo)
+            <section class="supplier-prototype-card supplier-redo-panel" aria-labelledby="supplier-redo-title">
+                <header class="supplier-prototype-card-head"><h2 id="supplier-redo-title">Redo details</h2></header>
+                <div class="supplier-redo-panel-body">
+                    <dl class="supplier-redo-grid">
+                        <div><dt>Original order</dt><dd>{{ $redo['original_reference'] }}</dd></div>
+                        <div><dt>Redo scope</dt><dd>{{ $redo['scope'] === 'artwork' ? 'Artwork + Production' : 'Production only' }}</dd></div>
+                        <div><dt>Issue category</dt><dd>{{ $redo['issue_category'] }}</dd></div>
+                        <div><dt>Affected quantity</dt><dd>{{ number_format($redo['affected_quantity']) }}</dd></div>
+                        <div><dt>Redo quantity</dt><dd>{{ number_format($redo['redo_quantity']) }}</dd></div>
+                    </dl>
+                    @if(! empty($redo['supplier_adjustment']))
+                        @php
+                            $adjustment = $redo['supplier_adjustment'];
+                            $adjustmentLabel = $adjustment['type'] === 'pcs'
+                                ? number_format((int) $adjustment['value']).' pcs'
+                                : rtrim(rtrim(number_format((float) $adjustment['value'], 2), '0'), '.').'%';
+                            $currency = strtoupper((string) ($order->payload['currency'] ?? 'USD'));
+                            $money = static fn ($amount) => ($currency === 'USD' ? '$' : $currency.' ').number_format((float) $amount, 2);
+                        @endphp
+                        <div class="supplier-redo-financial" aria-label="Supplier redo financial impact">
+                            <strong>Supplier financial impact</strong>
+                            <table class="supplier-redo-finance-table">
+                                <tbody>
+                                    <tr><th scope="row">Supplier · {{ $adjustmentLabel }}</th><td>{{ $money($adjustment['charge']) }}</td></tr>
+                                    <tr><th scope="row">Supplier freight deduction</th><td>{{ (float) $adjustment['freight'] > 0 ? $money($adjustment['freight']) : 'Not applicable' }}</td></tr>
+                                    <tr><th scope="row">Courier company freight deduction</th><td>{{ (float) ($adjustment['courier_freight'] ?? 0) > 0 ? $money($adjustment['courier_freight']) : 'Not applicable' }}</td></tr>
+                                    <tr class="supplier-redo-finance-total"><th scope="row">Total supplier recovery</th><td>{{ $money($adjustment['total_recovery']) }}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                    @if(filled($redo['issue_description'] ?? null))
+                        <div class="supplier-redo-reason"><strong>Issue and corrective requirements</strong><p>{{ $redo['issue_description'] }}</p></div>
+                    @endif
+                </div>
+            </section>
+            @endif
             <div class="supplier-prototype-grid">
                 <div class="supplier-prototype-primary-column">
                     <section class="supplier-prototype-card supplier-prototype-card--table">
@@ -201,10 +241,11 @@
     // The native modal stays in the browser top layer, independent of task-row height.
     var actionDialogs = Array.prototype.slice.call(document.querySelectorAll('[data-supplier-action-dialog]'));
     actionDialogs.forEach(function (dialog) {
-        document.body.appendChild(dialog);
+        // Keep dialogs inside the order root so their scoped design rules apply.
+        // showModal() still places them in the top layer, above the task grid.
+        (document.getElementById('supplierOrderView') || document.body).appendChild(dialog);
         var opener = document.querySelector('[data-supplier-modal-open="' + dialog.id + '"]');
         var form = dialog.querySelector('[data-supplier-action-form]');
-        if (!form) return;
         function closeDialog() {
             if (dialog.open) dialog.close();
         }
@@ -217,8 +258,43 @@
         dialog.addEventListener('close', function () {
             if (opener) opener.focus({ preventScroll: true });
         });
+        if (!form) return;
         var choice = form.querySelector('[data-supplier-client-choice]');
         var submit = form.querySelector('[data-supplier-action-submit]');
+        // Mirror FlowTracker's two-step QC dialog without changing the signed action contract.
+        var qcDecision = form.querySelector('[data-supplier-qc-decision]');
+        var qcCheck = form.querySelector('[data-supplier-qc-step="check"]');
+        var qcIssue = form.querySelector('[data-supplier-qc-step="issue"]');
+        if (qcDecision && qcCheck && qcIssue) {
+            var title = dialog.querySelector('[data-supplier-qc-title]');
+            var copy = dialog.querySelector('[data-supplier-qc-copy]');
+            var description = qcIssue.querySelector('textarea[name="comment"]');
+            var reportSubmit = qcIssue.querySelector('[data-supplier-action-submit]');
+            var setQcStep = function (reporting) {
+                qcCheck.hidden = reporting;
+                qcIssue.hidden = !reporting;
+                qcDecision.value = reporting ? 'issue' : 'pass';
+                if (description) description.required = reporting;
+                if (title) title.textContent = reporting ? 'Report QC Issue' : 'Product Quality Check';
+                if (copy) copy.textContent = reporting
+                    ? 'Describe the issue before notifying the supplier and blocking progression.'
+                    : 'Record received/inspected quantities and either pass QC or report an issue.';
+            };
+            var reportOpen = qcCheck.querySelector('[data-supplier-qc-report-open]');
+            if (reportOpen) reportOpen.addEventListener('click', function () {
+                setQcStep(true);
+                if (description) description.focus({ preventScroll: true });
+            });
+            var pass = qcCheck.querySelector('[data-supplier-qc-pass]');
+            if (pass) pass.addEventListener('click', function () {
+                setQcStep(false);
+                // requestSubmit performs native validation. The same backend handles
+                // a pass and a reported issue exactly as it does for FlowTracker.
+                if (reportSubmit) form.requestSubmit(reportSubmit);
+            });
+            dialog.addEventListener('close', function () { setQcStep(false); });
+            setQcStep(qcDecision.value === 'issue');
+        }
         var stage = function (name) {
             form.querySelectorAll('[data-client-decision-stage]').forEach(function (panel) {
                 panel.hidden = panel.dataset.clientDecisionStage !== name;
@@ -264,8 +340,11 @@
             if (form.dataset.submitting === 'true') { event.preventDefault(); return; }
             if (form.checkValidity()) {
                 form.dataset.submitting = 'true';
-                submit.disabled = true;
-                submit.textContent = 'Saving in FlowTracker…';
+                var clickedSubmit = event.submitter || submit;
+                if (clickedSubmit) {
+                    clickedSubmit.disabled = true;
+                    clickedSubmit.textContent = 'Saving in FlowTracker…';
+                }
             }
         });
     });

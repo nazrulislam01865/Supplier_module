@@ -240,6 +240,7 @@ final class SupplierOrderListing
         return [
             'id' => $order->id,
             'reference' => $order->external_reference,
+            'is_redo' => isset($payload['redo']) && is_array($payload['redo']),
             'created' => $created,
             'created_label' => $createdLabel,
             'item_count' => count($payload['items'] ?? []),

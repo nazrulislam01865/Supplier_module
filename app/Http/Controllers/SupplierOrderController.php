@@ -44,6 +44,7 @@ final class SupplierOrderController extends Controller
             'items' => $items,
             'stages' => $stages,
             'workflow' => $details['workflow'] ?? [],
+            'redo' => $details['redo'] ?? null,
             // Source events only. Do not reconstruct fictional status history.
             'recentUpdates' => collect($details['recent_updates'] ?? [])->take(9)->map(fn ($event) => [
                 'title' => $event['title'],
