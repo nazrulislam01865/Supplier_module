@@ -79,19 +79,22 @@
                             <div class="supplier-flow-task-copy">
                                 <span class="supplier-flow-task-code">TASK {{ $task['code'] }}</span>
                                 <strong>{{ $task['title'] }}</strong>
-                                @if(!$task['required']) <span class="supplier-flow-optional">Optional</span> @endif
+                                @if(!empty($task['sample_description'])) <small class="supplier-flow-muted">{{ $task['sample_description'] }}</small> @endif
+                                @if(($task['sample']['kind'] ?? '') !== '') <small class="supplier-flow-muted">{{ $task['sample']['kind'] === 'physical' ? 'Physical sample · shipment required' : 'Sample images · email only' }}</small> @endif
+                                @if(($task['sample']['state'] ?? '') === 'supplier_revision') <small class="supplier-flow-muted">Revision requested: {{ $task['sample']['review_note'] ?? '' }}</small> @endif
+                                @if(!$task['required'] && empty($task['sample'])) <span class="supplier-flow-optional">Optional</span> @endif
                             </div>
                             <div class="supplier-flow-assignee"><span class="supplier-flow-avatar">{{ mb_substr((string) $task['assignee'], 0, 1) }}</span> {{ $task['assignee'] }}</div>
                             <div class="supplier-flow-date">{{ !empty($task['due_date']) ? \Illuminate\Support\Carbon::parse($task['due_date'])->format('M j, Y') : '—' }}</div>
                             <div class="supplier-flow-task-status">
-                                <span class="supplier-flow-pill {{ $task['mode'] }}">{{ $task['mode'] === 'locked' ? 'Locked' : $task['status'] }}</span>
+                                <span class="supplier-flow-pill {{ $task['mode'] }}">{{ !empty($task['sample']) ? ($task['display_status'] ?? $task['status']) : ($task['mode'] === 'locked' ? 'Locked' : ($task['display_status'] ?? $task['status'])) }}</span>
                                 @include('portal.partials.qc-task-documents')
                             </div>
                             <div class="supplier-flow-action">
                                 @if(($task['can_act'] ?? false) && ($task['assigned_to_supplier'] ?? false) && ($task['action_key'] ?? '') !== 'PROD_SET_ESTIMATED_DELIVERY')
                                     @php
                                         $actionKey = (string) ($task['action_key'] ?? '');
-                                        $isUpload = in_array($actionKey, ['NEW_UPLOAD_PO','ART_PREPARE_UPLOAD','ART_SAMPLE_APPROVAL'], true);
+                                        $isUpload = in_array($actionKey, ['NEW_UPLOAD_PO','ART_PREPARE_UPLOAD'], true);
                                         $actionText = match ($actionKey) {
                                             'NEW_UPLOAD_PO' => 'Upload Purchase Order',
                                             'NEW_SEND_PO_ARTWORK' => 'Send to Artwork Team',
@@ -99,7 +102,7 @@
                                             'ART_INTERNAL_REVIEW' => 'Review Artwork',
                                             'ART_SEND_ORDER_TEAM' => 'Send Artwork',
                                             'ART_CLIENT_ERP_DECISION' => str_contains(strtolower((string) $task['status']), 'waiting for client') ? 'Record client decision' : 'Confirm ERP upload',
-                                            'ART_SAMPLE_APPROVAL' => 'Upload sample approval',
+                                            'ART_SAMPLE_APPROVAL' => ($task['sample']['state'] ?? '') === 'supplier_revision' ? 'Prepare revised sample' : (($task['sample']['kind'] ?? '') === 'physical' ? 'Confirm sample prepared' : 'Record sample image email'),
                                             'PROD_START' => 'Start production',
                                             'PROD_FINISH' => 'Finish production',
                                             'QC_CHECK' => 'Open QC check',
@@ -112,7 +115,7 @@
                                         };
                                     @endphp
                                     <button type="button" class="supplier-flow-action-btn" data-supplier-modal-open="supplier-flow-dialog-{{ (int) $task['id'] }}">{{ $actionText }}</button>
-                                    <dialog class="supplier-flow-dialog" @if($actionKey === 'QC_CHECK') data-supplier-qc-dialog @endif aria-modal="true" id="supplier-flow-dialog-{{ (int) $task['id'] }}" aria-labelledby="supplier-flow-dialog-title-{{ (int) $task['id'] }}" data-supplier-action-dialog>
+                                    <dialog class="supplier-flow-dialog" @if($actionKey === 'QC_CHECK') data-supplier-qc-dialog @endif @if($actionKey === 'ART_SAMPLE_APPROVAL') data-supplier-sample-dialog @endif aria-modal="true" id="supplier-flow-dialog-{{ (int) $task['id'] }}" aria-labelledby="supplier-flow-dialog-title-{{ (int) $task['id'] }}" data-supplier-action-dialog>
                                         <div class="supplier-flow-dialog-head">
                                             <div><h4 id="supplier-flow-dialog-title-{{ (int) $task['id'] }}" @if($actionKey === 'QC_CHECK') data-supplier-qc-title @endif>{{ match ($actionKey) {
                                                 'QC_CHECK' => 'Product Quality Check',
@@ -134,6 +137,22 @@
                                             <input type="hidden" name="_supplier_workflow_task" value="{{ (int) $task['id'] }}">
                                             @if($isUpload)
                                                 <input type="hidden" name="decision" value="upload">
+                                            @elseif($actionKey === 'ART_SAMPLE_APPROVAL')
+                                                <input type="hidden" name="decision" value="sample_prepared">
+                                                <p class="supplier-flow-sample-kind">{{ ($task['sample']['kind'] ?? '') === 'physical' ? 'Physical sample · shipment required' : 'Sample images · email only' }}</p>
+                                                @if(($task['sample']['state'] ?? '') === 'supplier_revision')
+                                                    <p class="supplier-flow-helper"><strong>Revision instructions:</strong> {{ $task['sample']['review_note'] ?? '' }}</p>
+                                                @elseif(!empty($task['sample']['request_notes']))
+                                                    <p class="supplier-flow-helper"><strong>Preparation instructions:</strong> {{ $task['sample']['request_notes'] }}</p>
+                                                @endif
+                                                @if(($task['sample']['kind'] ?? '') === 'physical')
+                                                    <p class="supplier-flow-helper">Supplier Portal · Preparation only. No shipping method or tracking fields here. After preparation FlowTracker will confirm receipt.</p>
+                                                @else
+                                                    <p class="supplier-flow-helper">Supplier Portal · Email-only option. Send the sample image to the specified recipient.</p>
+                                                    <label>Email recipient <input type="email" name="email_to" maxlength="255" value="{{ old('email_to', $task['sample']['email_to'] ?? '') }}" required placeholder="orderteam@example.com"></label>
+                                                    <label>Sample image file <input type="file" name="files[]" accept="image/*" required></label>
+                                                @endif
+                                                <label>Preparation note (optional) <textarea name="supplier_note" maxlength="1000" rows="3" placeholder="Sample is ready and sent to FlowTracker.">{{ old('supplier_note') }}</textarea></label>
                                             @elseif($actionKey === 'QC_CHECK')
                                                 <input type="hidden" name="decision" value="{{ old('_supplier_workflow_task') == $task['id'] ? old('decision', 'pass') : 'pass' }}" data-supplier-qc-decision>
                                             @elseif($actionKey === 'QC_ISSUE')
@@ -229,13 +248,13 @@
                                                             accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp,.gif,.ico,.zip,.txt,.csv,.ai,.eps,.esp,.cdr">
                                                     </label>
                                                 @endforeach
-                                            @elseif(!in_array($actionKey, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT'], true))
+                                            @elseif(!in_array($actionKey, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT', 'ART_SAMPLE_APPROVAL'], true))
                                                 <label>{{ $isUpload ? 'Upload task files' : 'Attach task evidence (optional)' }}
                                                     <input type="file" name="files[]" multiple @if($isUpload) required @endif
                                                         accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp,.gif,.ico,.zip,.txt,.csv,.ai,.eps,.esp,.cdr">
                                                 </label>
                                             @endif
-                                            @if(!in_array($actionKey, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT'], true))
+                                            @if(!in_array($actionKey, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT', 'ART_SAMPLE_APPROVAL'], true))
                                                 <small>{{ in_array($actionKey, ['ART_PREPARE_UPLOAD','ART_SAMPLE_APPROVAL'], true) ? 'Up to 400 MB per file' : 'Up to 20 MB per file' }} · max 5 files. Saved in FlowTracker on this task.</small>
                                                 <label>Comment <span class="supplier-flow-muted">(optional)</span><textarea name="comment" rows="2" maxlength="2000" placeholder="Add task notes if needed">{{ old('_supplier_workflow_task') == $task['id'] ? old('comment') : '' }}</textarea></label>
                                             @endif
@@ -245,6 +264,7 @@
                                                 @php
                                                     $submitLabel = match (true) {
                                                         $isUpload => 'Upload and complete task',
+                                                        $actionKey === 'ART_SAMPLE_APPROVAL' => (($task['sample']['kind'] ?? '') === 'physical' ? 'Confirm sample prepared' : 'Record image email'),
                                                                                                                 $actionKey === 'QC_ISSUE' => 'Issue Resolved',
                                                         $actionKey === 'QC_APPROVE_SHIPMENT' => 'Proceed to shipment',
                                                         $actionKey === 'ART_CLIENT_ERP_DECISION' => str_contains(strtolower((string) $task['status']), 'waiting for client') || str_contains(strtolower((string) $task['status']), 'client approval') ? 'Save client decision' : 'Confirm ERP upload',
@@ -257,7 +277,33 @@
                                         </form>
                                     </dialog>
                                 @else
-                                    @if($task['date_controlled_by_flowtracker'] ?? false)
+                                    @if(!empty($task['sample']) && ($task['assigned_to_supplier'] ?? false))
+                                        @php $sample = $task['sample']; @endphp
+                                        <button type="button" class="supplier-flow-action-btn" data-supplier-modal-open="supplier-flow-detail-{{ (int) $task['id'] }}">{{ ($sample['state'] ?? '') === 'approved' ? 'View approval' : 'View request' }}</button>
+                                        <dialog class="supplier-flow-dialog" id="supplier-flow-detail-{{ (int) $task['id'] }}" aria-modal="true" aria-labelledby="supplier-flow-detail-title-{{ (int) $task['id'] }}" data-supplier-action-dialog>
+                                            <div class="supplier-flow-dialog-head">
+                                                <div><h4 id="supplier-flow-detail-title-{{ (int) $task['id'] }}">Sample request &amp; activity</h4><p>Task {{ $task['code'] }} · Single conditional sample task</p></div>
+                                                <button type="button" class="supplier-flow-dialog-close" data-supplier-modal-close aria-label="Close">×</button>
+                                            </div>
+                                            <div class="supplier-flow-sample-details">
+                                                <dl>
+                                                    <dt>Sample type</dt><dd>{{ ($sample['kind'] ?? '') === 'physical' ? 'Physical sample · shipment required' : 'Sample images · email only' }}</dd>
+                                                    <dt>Current state</dt><dd>{{ $task['display_status'] ?? $task['status'] }}</dd>
+                                                    <dt>Revision count</dt><dd>{{ (int) ($sample['revisions'] ?? 0) }}</dd>
+                                                    @if(!empty($sample['request_notes']))<dt>Supplier instructions</dt><dd>{{ $sample['request_notes'] }}</dd>@endif
+                                                    @if(!empty($sample['review_note']))<dt>Last feedback</dt><dd>{{ $sample['review_note'] }}</dd>@endif
+                                                    @if(!empty($sample['received_on']))<dt>Received</dt><dd>{{ $sample['received_on'] }}</dd>@endif
+                                                    @if(!empty($sample['email_to']))<dt>Email recipient</dt><dd>{{ $sample['email_to'] }}</dd>@endif
+                                                    @if(!empty($sample['image_name']))<dt>Sample image</dt><dd>{{ $sample['image_name'] }}</dd>@endif
+                                                    @if(!empty($sample['shipping']))
+                                                        <dt>Shipment</dt><dd>{{ ($sample['shipping']['method'] ?? '') . ' · ' . ($sample['shipping']['carrier'] ?? '') }}</dd>
+                                                        <dt>Tracking ID</dt><dd>{{ $sample['shipping']['tracking'] ?? '' }}</dd>
+                                                    @endif
+                                                </dl>
+                                                <div class="supplier-flow-dialog-actions"><button type="button" class="supplier-flow-cancel" data-supplier-modal-close>Close</button></div>
+                                            </div>
+                                        </dialog>
+                                    @elseif($task['date_controlled_by_flowtracker'] ?? false)
                                         <span class="supplier-flow-no-action">FlowTracker sets date</span>
                                     @elseif(($task['assigned_to_supplier'] ?? false) && ($task['mode'] ?? '') === 'locked' && ($stage['state'] ?? '') === 'active')
                                         <span class="supplier-flow-no-action" title="This task will be available after earlier required tasks are completed in FlowTracker.">Waiting for previous task</span>

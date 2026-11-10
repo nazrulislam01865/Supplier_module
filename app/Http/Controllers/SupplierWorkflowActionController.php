@@ -48,11 +48,13 @@ final class SupplierWorkflowActionController extends Controller
         foreach (['estimated_delivery_date', 'supplier_delivery_date', 'shipment_date'] as $dateField) {
             abort_if($request->exists($dateField), 403);
         }
-        $documentKeys = ['NEW_UPLOAD_PO', 'ART_PREPARE_UPLOAD', 'ART_SAMPLE_APPROVAL'];
+        $documentKeys = ['NEW_UPLOAD_PO', 'ART_PREPARE_UPLOAD'];
+        $isSample = $key === 'ART_SAMPLE_APPROVAL';
+        $sampleImage = $isSample && ($taskData['sample']['kind'] ?? '') === 'images';
         // Only assigned, actionable task rows may submit. The buyer repeats
         // these checks against its live DB before any task or document write.
         $isDocumentTask = in_array($key, $documentKeys, true);
-        $maxKb = in_array($key, ['ART_PREPARE_UPLOAD', 'ART_SAMPLE_APPROVAL'], true) ? 409600 : 20480;
+        $maxKb = $sampleImage ? 10240 : ($key === 'ART_PREPARE_UPLOAD' ? 409600 : 20480);
         $allowedExtensions = ['pdf','doc','docx','xls','xlsx','jpg','jpeg','png','webp','gif','ico','zip','txt','csv','ai','eps','esp','cdr'];
         $validated = $request->validate([
             'decision' => ['required', 'string', 'max:30'],
@@ -64,6 +66,8 @@ final class SupplierWorkflowActionController extends Controller
             'qc_comments' => ['nullable', 'string', 'max:2000'],
             'issue_category' => ['nullable', 'string', 'max:100'],
             'erp_reference' => ['nullable', 'string', 'max:150'],
+            'email_to' => [$sampleImage ? 'required' : 'nullable', 'email', 'max:255'],
+            'supplier_note' => ['nullable', 'string', 'max:1000'],
             'carrier' => ['nullable', 'string', 'max:150'],
             'tracking_number' => ['nullable', 'string', 'max:150'],
             'client_name' => ['nullable', 'string', 'max:255'],
@@ -79,8 +83,11 @@ final class SupplierWorkflowActionController extends Controller
             'revision_document_ids.*' => ['integer', 'min:1', 'distinct'],
             'revision_notes' => ['sometimes', 'array', 'max:20'],
             'revision_notes.*' => ['nullable', 'string', 'max:2000'],
-            'files' => [($isDocumentTask || $isQcAttachment) ? 'required' : 'sometimes', 'array', 'max:5'],
-            'files.*' => ['file', 'max:'.$maxKb, function ($attribute, $value, $fail) use ($allowedExtensions) {
+            'files' => [($isDocumentTask || $isQcAttachment || $sampleImage) ? 'required' : 'sometimes', 'array', 'max:'.($sampleImage ? 1 : 5)],
+            'files.*' => ['file', 'max:'.$maxKb, function ($attribute, $value, $fail) use ($allowedExtensions, $sampleImage) {
+                if ($sampleImage && ! str_starts_with((string) $value->getMimeType(), 'image/')) {
+                    $fail('Choose a valid sample image.'); return;
+                }
                 if (! in_array(strtolower((string) $value->getClientOriginalExtension()), $allowedExtensions, true)) {
                     $fail('Unsupported task attachment format.');
                 }
@@ -88,6 +95,12 @@ final class SupplierWorkflowActionController extends Controller
         ]);
         // Validate supplier QC before calling FlowTracker. The buyer repeats the
         // canonical rules inside OrderWorkflowActionService under the task lock.
+        if ($isSample) {
+            if ($validated['decision'] !== 'sample_prepared' || ($sampleImage && ! $request->hasFile('files'))
+                || (! $sampleImage && $request->hasFile('files'))) {
+                throw ValidationException::withMessages(['workflow' => 'The sample preparation form is incomplete or no longer available.']);
+            }
+        }
         if (in_array($key, ['QC_CHECK', 'QC_ISSUE', 'QC_APPROVE_SHIPMENT'], true)) {
             $allowed = $isQcAttachment ? ['attach'] : match ($key) {
                 'QC_CHECK' => ['pass', 'issue'],
@@ -185,7 +198,7 @@ final class SupplierWorkflowActionController extends Controller
         $event = (string) Str::uuid();
         $inputKeys = [
             'qty_received', 'qty_inspected', 'qty_accepted', 'qty_rejected', 'qc_comments',
-            'issue_category', 'erp_reference', 'carrier', 'tracking_number',
+            'issue_category', 'erp_reference', 'email_to', 'supplier_note', 'carrier', 'tracking_number',
             'client_name', 'contact_name', 'phone_country_code', 'phone_number',
             'address', 'city', 'state', 'country', 'postal_code',
         ];
@@ -308,6 +321,8 @@ final class SupplierWorkflowActionController extends Controller
                 => 'QC issue recorded in FlowTracker. Resolve the QC issue before shipment approval.',
             $key === 'QC_ISSUE' && $validated['decision'] === 'resolve'
                 => 'QC issue resolved in FlowTracker. The waiting QC check has been completed.',
+            $key === 'ART_SAMPLE_APPROVAL' && $validated['decision'] === 'sample_prepared'
+                => 'Supplier sample preparation recorded in FlowTracker.',
             $key === 'QC_CHECK' && $validated['decision'] === 'pass'
                 => 'QC passed and recorded in FlowTracker.',
             $savedStatus === 'completed' || $validated['decision'] === 'confirm'

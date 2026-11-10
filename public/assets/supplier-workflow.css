@@ -135,3 +135,32 @@
 #supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-dialog-body{padding:18px 22px 22px}
 #supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-action-form{padding:16px 0 0}
 #supplierOrderView .supplier-flow-qc-document-dialog .supplier-flow-dialog-actions{margin-top:16px}
+
+/* Read-only sample details reuse the supplier workflow dialog and button theme. */
+#supplierOrderView .supplier-flow-sample-details { padding: 18px 22px 22px; }
+#supplierOrderView .supplier-flow-sample-details dl { display: grid; grid-template-columns: 120px minmax(0,1fr); gap: 10px; font-size: 12px; }
+#supplierOrderView .supplier-flow-sample-details dt { color: #74889f; }
+#supplierOrderView .supplier-flow-sample-details dd { margin: 0; overflow-wrap: anywhere; font-weight: 700; }
+#supplierOrderView .supplier-flow-sample-details .supplier-flow-dialog-actions { margin-top: 18px; }
+
+/* Scoped sample preparation dialog: consistent with the existing supplier form theme. */
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] { width:min(530px,calc(100vw - 24px)); }
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-action-form { gap:14px; }
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-sample-kind {
+    margin:0; padding:10px 12px; color:#006f63; font-size:12px; font-weight:800;
+    background:#edf9f5; border:1px solid #c9e9e0; border-radius:8px;
+}
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-helper {
+    margin:0; padding:12px; border-radius:8px; background:#f7f9fc;
+    border:1px solid #e2eaf1; color:#536a82; font-size:12px; line-height:1.55;
+}
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-action-form label { font-size:12px; }
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-action-form textarea { min-height:85px; }
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-action-form input[type=file] {
+    padding:9px; border:1px dashed #bdcddb; background:#fbfdfe; cursor:pointer;
+}
+#supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-dialog-actions { margin-top:4px; }
+@media(max-width:520px) {
+    #supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-dialog-actions { flex-wrap:wrap; }
+    #supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-dialog-actions button { flex:1; }
+}
