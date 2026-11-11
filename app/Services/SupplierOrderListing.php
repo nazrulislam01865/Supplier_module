@@ -64,7 +64,8 @@ final class SupplierOrderListing
             $needle = '%'.addcslashes(mb_strtolower($filters['search']), '%_\\').'%';
             $query->where(static function ($q) use ($needle): void {
                 $q->where('payload->listing->search_text', 'like', $needle)
-                    ->orWhere('external_reference', 'like', $needle);
+                    ->orWhere('external_reference', 'like', $needle)
+                    ->orWhere('payload->title', 'like', $needle);
             });
         }
         if ($filters['hold']) $query->whereJsonContains('payload->listing->on_hold', true);

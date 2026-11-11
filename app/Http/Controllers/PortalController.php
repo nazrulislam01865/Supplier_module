@@ -80,6 +80,18 @@ class PortalController extends Controller
         if ($request->has('orders_page')) $initialView = 'orders';
         if ($request->has('notifications_page')) $initialView = 'notifications';
         $company = $user->company;
+        // Live order search returns just the existing order components. This avoids
+        // reloading the page (and its dashboard/RFQ queries) on every typing pause.
+        if ($initialView === 'orders' && $request->header('X-Supplier-Order-Fragment') === '1') {
+            $listing = $orderListing->forCompany((int) $company->id, $request);
+            return response()->view('portal.partials.orders.fragment', [
+                'orderPage' => $listing['page'],
+                'orders' => $listing['rows'],
+                'orderFilters' => $listing['filters'],
+                'orderStages' => SupplierOrderListing::STAGES,
+                'orderStageCards' => $listing['stage_cards'],
+            ])->header('Cache-Control', 'private, no-store');
+        }
         $quotations = $this->quotations($company->id);
         $dashboard = $data->forUser($user);
         [$notificationType, $notificationState] = $this->notificationFilters($request);

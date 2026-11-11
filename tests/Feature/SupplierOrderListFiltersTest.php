@@ -88,6 +88,64 @@ final class SupplierOrderListFiltersTest extends TestCase
     }
 
 
+    public function test_search_finds_existing_order_by_identifier_in_supplier_visible_title(): void
+    {
+        [$company, $user] = $this->supplier('A');
+        [$other] = $this->supplier('B');
+        $matching = $this->order($company, 'ORDER-2026-03497', 'Waterproof Fanny Pack', []);
+        $payload = $matching->payload;
+        $payload['title'] = 'FO-345151 - Waterproof 13-inch Fanny Pack';
+        // Existing synced records have a search_text that excludes the title.
+        $matching->payload = $payload;
+        $matching->save();
+        $this->order($company, 'ORDER-2026-03498', 'Cap', []);
+        $hidden = $this->order($other, 'ORDER-PRIVATE-03499', 'Private Shirt', []);
+        $hiddenPayload = $hidden->payload;
+        $hiddenPayload['title'] = 'FO-345151 - Other supplier';
+        $hidden->payload = $hiddenPayload;
+        $hidden->save();
+
+        $this->actingAs($user)->get(route('supplier.home', ['view' => 'orders', 'search' => '345151']))
+            ->assertOk()->assertSee('ORDER-2026-03497')->assertDontSee('ORDER-2026-03498')
+            ->assertDontSee('ORDER-PRIVATE-03499');
+        $this->get(route('supplier.home', ['view' => 'orders', 'search' => 'FO-345151']))
+            ->assertOk()->assertSee('ORDER-2026-03497')->assertDontSee('ORDER-2026-03498');
+        // Reference and product-name search remain unchanged.
+        $this->get(route('supplier.home', ['view' => 'orders', 'search' => '03497']))
+            ->assertOk()->assertSee('ORDER-2026-03497');
+        $this->get(route('supplier.home', ['view' => 'orders', 'search' => 'Waterproof Fanny Pack']))
+            ->assertOk()->assertSee('ORDER-2026-03497');
+    }
+
+    public function test_live_order_search_fragment_keeps_supplier_scope_without_rendering_the_dashboard(): void
+    {
+        [$company, $user] = $this->supplier('A');
+        [$other] = $this->supplier('B');
+        $visible = $this->order($company, 'ORDER-2026-03497', 'Waterproof Fanny Pack', []);
+        $payload = $visible->payload;
+        $payload['title'] = 'FO-345151 - Waterproof Fanny Pack';
+        $visible->payload = $payload;
+        $visible->save();
+        $this->order($other, 'ORDER-PRIVATE', 'Private Product', []);
+
+        $this->actingAs($user)->withHeader('X-Supplier-Order-Fragment', '1')
+            ->get(route('supplier.home', ['view' => 'orders', 'search' => '345151']))
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'private, no-store')
+            ->assertSee('id="supplierOrdersList"', false)
+            ->assertSee('supplier-order-stages')
+            ->assertSee('ORDER-2026-03497')
+            ->assertDontSee('ORDER-PRIVATE')
+            ->assertDontSee('<!doctype html>', false)
+            ->assertDontSee('id="dashboardContent"', false);
+
+        // Without the fragment request, the existing full-page behavior remains.
+        $this->withHeader('X-Supplier-Order-Fragment', '0')
+            ->get(route('supplier.home', ['view' => 'orders', 'search' => '345151']))
+            ->assertOk()
+            ->assertSee('<!doctype html>', false);
+    }
+
     public function test_only_relevant_stage_cards_filter_supplier_orders_and_preserve_other_filters(): void
     {
         [$company, $user] = $this->supplier('A');
