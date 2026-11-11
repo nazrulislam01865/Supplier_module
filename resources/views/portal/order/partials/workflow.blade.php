@@ -91,7 +91,22 @@
                                 @include('portal.partials.qc-task-documents')
                             </div>
                             <div class="supplier-flow-action">
-                                @if(($task['can_act'] ?? false) && ($task['assigned_to_supplier'] ?? false) && ($task['action_key'] ?? '') !== 'PROD_SET_ESTIMATED_DELIVERY')
+                                @if(($task['action_key'] ?? '') === 'ART_SUPPLIER_PO_OPTIONAL' && ($task['can_act'] ?? false) && ($task['assigned_to_supplier'] ?? false) && !empty($order->payload['po_creation_available']))
+                                    <div class="supplier-po-task-actions" role="group" aria-label="Optional Purchase Order actions">
+                                        <a class="supplier-flow-action-btn supplier-po-create-btn"
+                                            href="{{ route('supplier.purchase-orders.show', ['id' => $order->id, 'create' => 1]) }}"
+                                            title="Choose Single or Split Purchase Orders">
+                                            <span class="supplier-po-create-symbol" aria-hidden="true">+</span> Create PO
+                                        </a>
+                                        <form method="POST" action="{{ route('supplier.orders.workflow.action', [$order->id, $task['id']]) }}" class="supplier-po-skip-form">
+                                            @csrf
+                                            <input type="hidden" name="decision" value="skip">
+                                            <button class="supplier-flow-action-btn supplier-po-skip-btn" type="submit"
+                                                title="Continue without creating a Purchase Order"
+                                                onclick="return confirm('Skip the optional Purchase Order for this Order?')">Skip PO</button>
+                                        </form>
+                                    </div>
+                                @elseif(($task['can_act'] ?? false) && ($task['assigned_to_supplier'] ?? false) && !in_array(($task['action_key'] ?? ''), ['PROD_SET_ESTIMATED_DELIVERY', 'ART_SUPPLIER_PO_OPTIONAL'], true))
                                     @php
                                         $actionKey = (string) ($task['action_key'] ?? '');
                                         $isUpload = in_array($actionKey, ['NEW_UPLOAD_PO','ART_PREPARE_UPLOAD'], true);

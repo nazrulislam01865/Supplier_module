@@ -164,3 +164,17 @@
     #supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-dialog-actions { flex-wrap:wrap; }
     #supplierOrderView .supplier-flow-dialog[data-supplier-sample-dialog] .supplier-flow-dialog-actions button { flex:1; }
 }
+
+/* Optional PO action fits both buttons in the existing task-table Action column. */
+#supplierOrderView .supplier-flow-columns,#supplierOrderView .supplier-flow-task{grid-template-columns:28px minmax(155px,2fr) minmax(100px,1fr) minmax(90px,.85fr) minmax(98px,1fr) minmax(207px,1.25fr);min-width:820px}
+#supplierOrderView .supplier-po-task-actions{display:grid;grid-template-columns:minmax(112px,1fr) minmax(78px,auto);gap:8px;align-items:stretch;width:100%;min-width:0}
+#supplierOrderView .supplier-po-task-actions .supplier-flow-action-btn{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:42px;padding:9px 10px;border-radius:8px;white-space:nowrap;font-size:12px;line-height:1.2;font-weight:800}
+#supplierOrderView .supplier-po-task-actions .supplier-po-create-btn{background:#008778;color:#fff;border:1px solid #008778}
+#supplierOrderView .supplier-po-create-btn:hover{background:#006e63}
+#supplierOrderView .supplier-po-create-symbol{display:inline-grid;place-items:center;border:1.5px solid currentColor;border-radius:4px;width:15px;height:15px;font-size:14px;line-height:12px;font-weight:700}
+#supplierOrderView .supplier-po-task-actions .supplier-po-skip-form{margin:0;display:flex;min-width:0}
+#supplierOrderView .supplier-po-task-actions .supplier-po-skip-btn{flex:1;background:#fff;color:#53677d;border:1px solid #cad8e3}
+#supplierOrderView .supplier-po-task-actions .supplier-po-skip-btn:hover{background:#f0f5f8;border-color:#9aacbb}
+#supplierOrderView .supplier-po-task-actions :is(a,button):focus-visible{outline:2px solid #008c7e;outline-offset:2px}
+@media(max-width:920px){#supplierOrderView .supplier-flow-columns,#supplierOrderView .supplier-flow-task{min-width:820px}}
+@media(max-width:767px){#supplierOrderView .supplier-flow-task{min-width:0}#supplierOrderView .supplier-po-task-actions{width:min(100%,320px)}}

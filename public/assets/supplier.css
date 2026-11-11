@@ -1897,3 +1897,6 @@ body.supplier-notification-open { overflow:hidden; }
 .supplier-redo-finance-table td{text-align:right;font-weight:700;white-space:nowrap}
 .supplier-redo-finance-total th,.supplier-redo-finance-total td{color:#008c7c;font-weight:700}
 @media(max-width:580px){.supplier-redo-finance-table th,.supplier-redo-finance-table td{padding:10px 0}}
+
+/* Reuse the Orders list for Purchase Order navigation. */
+.supplier-order-po-link{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#087c71;text-decoration:none}.supplier-order-po-link:hover{text-decoration:none;color:#005f56}

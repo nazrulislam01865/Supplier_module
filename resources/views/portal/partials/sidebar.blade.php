@@ -2,7 +2,8 @@
     // The same sidebar is used by the SPA workspace and standalone order details.
     $isOrderDetail = $isOrderDetail ?? false;
     $isProductPrices = $isProductPrices ?? request()->routeIs('supplier.products.prices*');
-    $isStandalone = $isOrderDetail || $isProductPrices;
+    $isPurchaseOrders = $isPurchaseOrders ?? request()->routeIs('supplier.purchase-orders.*');
+    $isStandalone = $isOrderDetail || $isProductPrices || $isPurchaseOrders;
     $initialView = $initialView ?? 'dashboard';
     $unreadCount = $isStandalone ? ($sidebarCounts['unread'] ?? 0) : ($dashboard['unreadNotifications'] ?? 0);
 @endphp
@@ -35,6 +36,10 @@
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v13H4z"/><path d="M8 7V4h8v3M8 11h8"/></svg>
             Orders &amp; Requests <span class="nav-count">{{ $isStandalone ? ($sidebarCounts['orders'] ?? 0) : $orderPage->total() }}</span>
         @if($isStandalone)</a>@else</button>@endif
+        <a class="nav-item {{ $isPurchaseOrders ? 'active' : '' }}" href="{{ route('supplier.purchase-orders.index') }}" @if($isPurchaseOrders)aria-current="page"@endif>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h4M10 13h6M10 17h6"/><path d="M5 8H3v13h12"/></svg>
+            Purchase Orders
+        </a>
         <a class="nav-item {{ $isProductPrices ? 'active' : '' }}" href="{{ route('supplier.products.prices') }}" @if($isProductPrices)aria-current="page"@endif>
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
             Products &amp; Prices

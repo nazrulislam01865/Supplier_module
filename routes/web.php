@@ -47,6 +47,15 @@ Route::middleware(['auth',EnforceSupplierSessionTimeout::class,EnsureSupplierAct
         ->whereNumber('id')->name('supplier.products.prices.edit');
     Route::post('/products/prices/{id}', [\App\Http\Controllers\SupplierProductPriceController::class, 'submit'])
         ->whereNumber('id')->middleware('throttle:10,1')->name('supplier.products.prices.submit');
+    Route::get('/purchase-orders', [\App\Http\Controllers\SupplierPurchaseOrderController::class, 'index'])
+        ->name('supplier.purchase-orders.index');
+    Route::get('/orders/{id}/purchase-orders', [\App\Http\Controllers\SupplierPurchaseOrderController::class, 'show'])
+        ->whereNumber('id')->name('supplier.purchase-orders.show');
+    Route::post('/orders/{id}/purchase-orders', [\App\Http\Controllers\SupplierPurchaseOrderController::class, 'save'])
+        ->whereNumber('id')->middleware('throttle:10,1')->name('supplier.purchase-orders.save');
+    Route::get('/orders/{id}/purchase-orders/{po}/{document}/download', [\App\Http\Controllers\SupplierPurchaseOrderController::class, 'download'])
+        ->whereNumber('id')->whereNumber('po')->whereNumber('document')->middleware('throttle:20,1')
+        ->name('supplier.purchase-orders.download');
     Route::get('/orders/{id}',[\App\Http\Controllers\SupplierOrderController::class,'show'])->whereNumber('id')->name('supplier.orders.show');
     Route::get('/orders/{id}/realtime-revision', [\App\Http\Controllers\SupplierOrderRealtimeController::class, 'revision'])
         ->whereNumber('id')->middleware('throttle:30,1')->name('supplier.orders.realtime.revision');

@@ -31,7 +31,8 @@ class AppServiceProvider extends ServiceProvider
             $data = $view->getData();
             $standalone = ($data['isOrderDetail'] ?? false)
                 || ($data['isProductPrices'] ?? false)
-                || request()->routeIs('supplier.orders.show', 'supplier.products.prices*');
+                || ($data['isPurchaseOrders'] ?? false)
+                || request()->routeIs('supplier.orders.show', 'supplier.products.prices*', 'supplier.purchase-orders.*');
             if (! $standalone || ! auth()->check()) {
                 return;
             }

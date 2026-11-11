@@ -145,3 +145,9 @@
   #portalView #view-orders .supplier-order-stage-bottom { font-size:10px; }
   #portalView #view-orders .supplier-order-stage-bottom b { font-size:18px; }
 }
+
+/* Optional Artwork PO actions: two distinct controls, no workflow restructuring. */
+.supplier-flow-action:has(.supplier-po-skip-form){display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.supplier-po-skip-form{margin:0;display:inline-flex}
+.supplier-po-skip-btn{background:#fff!important;color:#006f68!important;border:1px solid #97c8c2!important;white-space:nowrap}
+.supplier-po-skip-btn:hover{background:#eef9f7!important}

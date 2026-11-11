@@ -14,6 +14,7 @@
                     <a class="supplier-order-ref" href="{{ $detailsUrl }}">{{ $order['reference'] }}</a>
                     @if($order['is_redo'])<span class="supplier-redo-badge">Redo order</span>@endif
                     <span class="supplier-order-subline">{{ $order['created'] }}</span>
+                    <a class="supplier-order-po-link" href="{{ route('supplier.purchase-orders.show', $order['id']) }}">Purchase Orders</a>
                     @if($order['hold'])<span class="supplier-order-hold-label">Ⅱ On Hold</span>@endif
                 </td>
                 <td data-label="Product">

@@ -68,6 +68,14 @@
                 <h1>{{ $summary['title'] }}</h1>
                 @if($redo)<span class="supplier-redo-badge">Redo order</span>@endif
             </header>
+            @php
+                $supplierPoCount = count($order->payload['purchase_orders'] ?? []);
+            @endphp
+            <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+                <a class="btn btn-primary" href="{{ route('supplier.purchase-orders.show', $order->id) }}">
+                    {{ $supplierPoCount ? 'View / Edit Purchase Orders ('.$supplierPoCount.')' : 'Purchase Orders' }}
+                </a>
+            </div>
             @if($redo)
             <section class="supplier-prototype-card supplier-redo-panel" aria-labelledby="supplier-redo-title">
                 <header class="supplier-prototype-card-head"><h2 id="supplier-redo-title">Redo details</h2></header>
