@@ -1,0 +1,6 @@
+@include('portal.product-native.sections.availability')
+@include('portal.product-native.sections.supplier_pricing')
+@include('portal.product-native.sections.client_pricing')
+@include('portal.product-native.sections.shipment')
+@include('portal.product-native.sections.options')
+@include('portal.product-native.sections.documents')

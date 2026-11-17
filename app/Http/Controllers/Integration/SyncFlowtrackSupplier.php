@@ -45,6 +45,12 @@ final class SyncFlowtrackSupplier extends Controller
             'products.*.supplier_prices' => ['present', 'array', 'max:100'],
             'products.*.supplier_prices.*.quantity' => ['required', 'integer', 'min:1'],
             'products.*.supplier_prices.*.price' => ['required', 'numeric', 'min:0'],
+            'products.*.supplier_charges' => ['sometimes', 'array', 'max:100'],
+            'products.*.supplier_charges.*.quantity' => ['required', 'integer', 'min:1'],
+            'products.*.supplier_charges.*.remote_surcharge' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:999999999.99'],
+            'products.*.supplier_charges.*.standard_shipment' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:999999999.99'],
+            'products.*.supplier_charges.*.urgent_shipment' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:999999999.99'],
+            'products.*.supplier_price_currency' => ['sometimes', 'regex:/^[A-Z]{3}$/'],
             'products.*.price_version' => ['required', 'regex:/^[a-f0-9]{64}$/'],
             'products.*.image_url' => ['sometimes', 'nullable', 'url:http,https', 'max:2048'],
             'products.*.image_version' => ['sometimes', 'nullable', 'regex:/^[a-f0-9]{64}$/'],
@@ -107,7 +113,10 @@ final class SyncFlowtrackSupplier extends Controller
                 $references[] = $ref;
                 $payload = [
                     'code' => $product['code'], 'name' => $product['name'],
-                    'supplier_prices' => $product['supplier_prices'], 'price_version' => $product['price_version'],
+                    'supplier_prices' => $product['supplier_prices'],
+                    'supplier_charges' => $product['supplier_charges'] ?? [],
+                    'supplier_price_currency' => $product['supplier_price_currency'] ?? 'USD',
+                    'price_version' => $product['price_version'],
                     'image_url' => null, 'image_version' => $product['image_version'] ?? null,
                     'image_extension' => $product['image_extension'] ?? null,
                 ];

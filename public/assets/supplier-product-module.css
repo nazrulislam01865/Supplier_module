@@ -1,0 +1,325 @@
+/* Supplier-side native Product UI; scoped to its page, never touches other portal modules. */
+#portalView.supplier-product-module-page .supplier-product-module-main { padding:0;min-width:0;background:#f6f8fb;overflow:auto; }
+#portalView.supplier-product-module-page .ft-native-product{max-width:1440px;margin:0 auto;padding:24px 28px 48px;color:#203047;font-family:inherit;}
+#portalView.supplier-product-module-page .ft-native-product *, #portalView.supplier-product-module-page .ft-native-product *::before, #portalView.supplier-product-module-page .ft-native-product *::after{box-sizing:border-box;}
+.ft-native-product h1,.ft-native-product h2,.ft-native-product h3,.ft-native-product p{margin-top:0;}
+.ft-native-product h1{font-size:26px;font-weight:750;letter-spacing:-.03em;margin:0 0 7px;color:#1b293f;}
+.ft-native-product h2{font-size:18px;font-weight:730;letter-spacing:-.015em;margin:0;}
+.ft-native-product h3{font-size:14px;font-weight:700;margin:16px 0 12px;}
+.ft-native-product p,.ft-native-product small{color:#607187;}
+.ft-native-product a{color:#047d70;text-decoration:none;}
+.ft-native-product a:hover{text-decoration:underline;}
+.ft-native-breadcrumb{display:flex;gap:10px;align-items:center;font-size:13px;color:#78879b;margin:3px 0 18px;}
+.ft-native-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:20px;}
+.ft-native-header p{font-size:13px;line-height:1.6;margin:0;color:#75849a;}
+.ft-native-header-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.ft-native-card{background:#fff;border:1px solid #d9e3ee;border-radius:14px;box-shadow:0 1px 2px #13254004;}
+.ft-native-product .ft-native-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #cbd8e6;border-radius:9px;font-size:13px;font-weight:700;padding:10px 16px;background:#fff;color:#34445b;cursor:pointer;white-space:nowrap;text-decoration:none;min-height:38px;}
+.ft-native-product .ft-native-btn.is-primary{background:#008779;border-color:#008779;color:#fff;}
+.ft-native-product .ft-native-btn.is-primary:hover{background:#006e64;}
+.ft-native-product .ft-native-btn.is-danger{background:#fff4f3;color:#ae3939;border-color:#f3cbcb;}
+.ft-native-filters{padding:16px;display:flex;align-items:center;gap:10px;margin:0 0 16px;}
+.ft-native-search-label{flex:1;}
+.ft-native-product input:not([type=hidden]):not([type=checkbox]),.ft-native-product select,.ft-native-product textarea{width:100%;border:1px solid #cdd9e8;background:#fff;color:#25354c;border-radius:8px;font-size:13px;padding:11px 12px;min-height:40px;font-family:inherit;}
+.ft-native-product input:focus,.ft-native-product select:focus,.ft-native-product textarea:focus{border-color:#008779;outline:2px solid #00877920;}
+.ft-native-product textarea{resize:vertical;line-height:1.5;}
+.ft-native-product label>span{display:block;color:#3d4e66;font-size:12px;font-weight:700;margin-bottom:8px;}
+.ft-native-table-scroll,.ft-native-matrix-scroll{width:100%;overflow-x:auto;}
+.ft-native-list-table,.ft-native-price-table{border-collapse:collapse;width:100%;min-width:690px;text-align:left;}
+.ft-native-list-table th,.ft-native-list-table td{padding:13px 15px;border-bottom:1px solid #e7edf4;font-size:12px;vertical-align:middle;}
+.ft-native-list-table th{font-size:11px;color:#63728b;background:#f6f8fb;font-weight:750;white-space:nowrap;}
+.ft-native-list-table tr:last-child td{border-bottom:0;}
+.ft-native-list-table td strong{font-weight:700;}
+.ft-native-small{display:block;margin-top:5px;font-size:11px;line-height:1.4;}
+.ft-native-product-link{font-weight:700;font-size:13px;}
+.ft-native-row-actions{display:flex;align-items:center;gap:14px;}
+.ft-native-row-actions button{background:none;border:none;padding:0;color:#c23b45;cursor:pointer;font-weight:650;}
+.ft-native-status{display:inline-flex;font-weight:700;font-size:11px;border-radius:99px;padding:4px 9px;background:#eaf9f5;color:#147c5f;}
+.ft-native-status.inactive{background:#f3f4f6;color:#667080;}
+.ft-native-empty{padding:46px!important;text-align:center;color:#71819a;}
+.ft-native-pager{display:flex;justify-content:space-between;align-items:center;margin-top:15px;color:#63728b;font-size:12px;gap:15px;}
+.ft-native-pager a{border:1px solid #cad7e6;border-radius:7px;padding:7px 11px;margin-left:8px;background:#fff;}
+.ft-native-form-card{padding:22px 24px;}
+.ft-native-section{padding:21px 24px;margin:0 0 18px;}
+.ft-native-form-card .ft-native-section{border:0;border-bottom:1px solid #e4eaf2;padding:15px 0 22px;border-radius:0;}
+.ft-native-section-heading{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;}
+.ft-native-section-heading p{margin:7px 0 0;font-size:12px;}
+.ft-native-section-number{display:grid;place-items:center;background:#e0f6f1;color:#007e71;border-radius:8px;width:28px;height:28px;font-weight:750;font-size:13px;flex-shrink:0;}
+.ft-native-grid{display:grid;gap:18px;}
+.ft-native-grid-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.ft-native-grid-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.ft-native-span-full{grid-column:1/-1;}
+.ft-native-form-actions{display:flex;justify-content:flex-end;align-items:flex-end;flex-wrap:wrap;gap:10px;padding-top:15px;}
+.ft-native-price-label{font-size:13px;font-weight:750;color:#233149;margin-bottom:12px;}
+.ft-native-matrix-wrap{border:1px solid #d8e1ed;border-radius:10px;overflow:hidden;}
+.ft-native-price-table{min-width:600px;table-layout:fixed;}
+.ft-native-price-table th,.ft-native-price-table td{border-right:1px solid #e1e8f0;border-bottom:1px solid #e9edf3;padding:12px;text-align:center;font-size:12px;font-weight:650;min-width:130px;}
+.ft-native-price-table thead th{background:#f5f8fb;color:#55647b;}
+.ft-native-price-table .ft-native-rowhead{text-align:left;width:230px;min-width:190px;}
+.ft-native-price-table .ft-native-tier-cell input{padding:8px 9px;min-width:85px;border-radius:6px;font-weight:650;text-align:center;}
+.ft-native-matrix-controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-top:1px solid #e2eaf2;}
+.ft-native-matrix-controls button,.ft-native-add-row{color:#007e71;font-size:12px;font-weight:700;background:none;border:0;cursor:pointer;}
+.ft-native-matrix-controls small{margin-left:auto;font-size:11px;}
+.ft-native-detail-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:32px;}
+.ft-native-detail-list{margin:0;}
+.ft-native-detail-list>div{display:grid;grid-template-columns:minmax(135px, .42fr) 1fr;gap:12px;border-bottom:1px solid #ebeff5;padding:11px 0;}
+.ft-native-detail-list dt{color:#68778c;font-size:12px;}
+.ft-native-detail-list dd{margin:0;font-size:13px;font-weight:650;min-width:0;overflow-wrap:anywhere;}
+.ft-native-multiline{white-space:pre-line;}
+.ft-native-image-panel{background:#f7f9fb;border-radius:12px;min-height:200px;display:grid;place-items:center;overflow:hidden;border:1px solid #e5ebf2;}
+.ft-native-image-panel img{max-width:100%;max-height:300px;object-fit:contain;}
+.ft-native-no-image{color:#96a3b2;font-size:13px;}
+.ft-native-price-table tr:last-child td,.ft-native-price-table tr:last-child th{border-bottom:0;}
+.ft-native-chips{display:flex;gap:6px;flex-wrap:wrap;}.ft-native-chips span{background:#eff7f5;border-radius:30px;font-size:11px;padding:6px 10px;color:#107b69;}
+.ft-native-inline-form{border-top:1px solid #e5ecf3;margin-top:17px;padding-top:18px;}
+.ft-native-repeat-row{display:flex;gap:12px;margin-bottom:10px;align-items:center;}
+.ft-native-repeat-row input,.ft-native-repeat-row select{flex:1;}
+.ft-native-repeat-row button{background:transparent;border:none;color:#a23d3d;font-size:12px;font-weight:700;cursor:pointer;}
+.ft-native-repeat{margin:15px 0;}.ft-native-document-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;}
+.ft-native-document{background:#f9fbfd;border:1px solid #e3eaf2;padding:14px;border-radius:10px;min-width:0;}
+.ft-native-document h3{margin:0 0 12px;}.ft-native-document p{font-size:12px;}.ft-native-document form{display:grid;gap:9px;margin-top:12px;}
+.ft-native-document .ft-native-btn{width:max-content;}.ft-native-currency{min-width:200px;}
+.ft-native-alert{padding:14px 16px;margin-bottom:18px;border-radius:9px;font-size:13px;font-weight:650;background:#eaf8ef;color:#16785b;border:1px solid #c2e6d3;}
+.ft-native-alert.is-danger{background:#fff1f1;color:#9d3838;border-color:#eed0d0;}
+.supplier-product-module-error{width:min(680px,100%);margin:30px auto;padding:25px;background:#fff;border:1px solid #dbe3ee;border-radius:14px;}
+.supplier-product-module-error h2{margin:0 0 10px;}.supplier-product-module-error p{font-size:13px;line-height:1.7;}
+.ft-native-hint{font-size:12px;margin-top:14px;}.ft-native-subtitle{font-size:12px;}.ft-native-subsection{margin-top:22px;padding-top:12px;border-top:1px solid #e4eaf2;}
+@media(max-width:1050px){.ft-native-grid-3{grid-template-columns:repeat(2,minmax(0,1fr));}.ft-native-detail-grid{grid-template-columns:1fr;}.ft-native-document-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:680px){#portalView.supplier-product-module-page .ft-native-product{padding:17px 14px 30px;}.ft-native-header{flex-direction:column;}.ft-native-header-actions{width:100%;}.ft-native-grid-2,.ft-native-grid-3,.ft-native-document-grid{grid-template-columns:1fr;}.ft-native-section{padding:15px;}.ft-native-form-card{padding:16px;}.ft-native-filters{flex-wrap:wrap;}.ft-native-search-label{flex-basis:100%;}.ft-native-detail-list>div{grid-template-columns:1fr;gap:5px;}.ft-native-repeat-row{flex-wrap:wrap;}.ft-native-repeat-row input,.ft-native-repeat-row select{min-width:120px;}}
+
+.ft-native-option-image{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 0;border-top:1px solid #e5ecf3;font-size:12px;}
+.ft-native-option-image img{object-fit:contain;border:1px solid #e5ecf3;border-radius:8px;background:#fff;}
+.ft-native-option-image form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ft-native-option-image input[type=file]{width:min(230px,100%)!important;min-height:0!important;}
+
+/* Keep the supplier sidebar unchanged; the product editor follows FlowTracker's six-section layout. */
+#portalView.supplier-product-module-page .ft-product-form-shell > form,
+#portalView.supplier-product-module-page .ft-product-form-shell > .ft-product-page-section {min-width:0;}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-page-section .ft-native-section {
+    padding:0;margin:0 0 16px;border:0;border-radius:0;box-shadow:none;background:transparent;
+}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-page-section .ft-native-section-heading {
+    margin:0 0 12px;align-items:center;
+}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-page-section .ft-native-section-heading h2 {
+    font-size:14px;color:#1d304b;font-weight:740;
+}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-page-section .ft-native-section-heading p {
+    font-size:12px;margin:3px 0 0;
+}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-native-matrix-wrap {
+    border-radius:8px;border-color:#dfe6ee;
+}
+#portalView.supplier-product-module-page .ft-supplier-currency-add > summary {
+    cursor:pointer;list-style:none;width:max-content;
+}
+#portalView.supplier-product-module-page .ft-supplier-currency-add > summary::-webkit-details-marker {display:none;}
+#portalView.supplier-product-module-page .ft-supplier-currency-entry .ft-native-matrix-wrap {margin-top:12px;}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-form-bottom-actions {margin-top:6px;}
+@media (max-width:680px){
+    #portalView.supplier-product-module-page .ft-supplier-currency-add > summary {max-width:100%;}
+    #portalView.supplier-product-module-page .ft-native-form-actions {justify-content:flex-start;}
+}
+#portalView.supplier-product-module-page #supplier-native-product-form {display:contents;}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-form-shell .ft-product-page-section {min-width:0;}
+/* Match FlowTracker's direct section styling even though the supplier fields
+   belong to a separate POST form (other API-backed sections have own forms). */
+#portalView.supplier-product-module-page .ft-product-form-shell > #supplier-native-product-form > .ft-product-page-section {
+    margin:0;border:0;border-radius:0;box-shadow:none;border-bottom:1px solid #d8e0ea;
+}
+#portalView.supplier-product-module-page .ft-product-form-shell > #supplier-native-product-form > .ft-product-page-section:first-child {
+    border-top-left-radius:9px;border-top-right-radius:9px;
+}
+
+/* Supplier currency pricing: compact groups with native disclosure controls. */
+.ft-price-section-hint{margin:0 0 13px;color:#667085;font-size:12px;line-height:1.55}
+.ft-price-suppliers{display:grid;gap:10px;min-width:0}
+.ft-price-supplier,.ft-price-currency{border:1px solid #dce4ee;border-radius:10px;background:#fff;min-width:0;overflow:hidden}
+.ft-price-supplier[open]{border-color:#cbd9e9;box-shadow:0 2px 8px rgba(28,50,77,.04)}
+.ft-price-supplier-heading,.ft-price-currency-heading{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;padding:14px 16px;min-width:0;background:#fff}
+.ft-price-supplier-heading::-webkit-details-marker,.ft-price-currency-heading::-webkit-details-marker{display:none}
+.ft-price-supplier-heading:hover,.ft-price-currency-heading:hover{background:#f8fafc}
+.ft-price-supplier-heading:focus-visible,.ft-price-currency-heading:focus-visible{outline:2px solid #2563eb;outline-offset:-3px}
+.ft-price-supplier-identity,.ft-price-currency-identity{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
+.ft-price-supplier-identity{flex-direction:column;align-items:flex-start;gap:2px}
+.ft-price-supplier-identity strong{font-size:14px;color:#18253a;overflow-wrap:anywhere}
+.ft-price-supplier-identity small{font-size:11px;color:#667085}
+.ft-price-supplier-meta,.ft-price-currency-meta{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;flex-shrink:0}
+.ft-price-badge{display:inline-flex;align-items:center;white-space:nowrap;border:1px solid #cbdfe8;background:#f1f8fb;color:#24526a;padding:4px 8px;border-radius:5px;font-size:11px;font-weight:700;line-height:1.3}
+.ft-price-badge.is-primary{color:#24526a;background:#edf7fc}
+.ft-price-badge.is-muted{color:#55667c;background:#f5f7fa;border-color:#e0e5ec}
+.ft-price-chevron{display:inline-block;width:8px;height:8px;flex-shrink:0;border-right:2px solid #667085;border-bottom:2px solid #667085;transform:rotate(45deg);transition:transform .15s;margin:0 3px 4px 8px}
+.ft-price-supplier[open]>.ft-price-supplier-heading .ft-price-chevron,.ft-price-currency[open]>.ft-price-currency-heading .ft-price-chevron{transform:rotate(225deg);margin-bottom:0}
+.ft-price-supplier-body{padding:13px 14px 14px;border-top:1px solid #e8edf3;background:#fbfcfe;display:grid;gap:10px}
+.ft-price-currency-heading{padding:11px 13px;background:#fff}
+.ft-price-currency-identity strong{font-size:13px;color:#243449}
+.ft-price-currency-meta{font-size:11px;color:#667085}
+.ft-price-currency-body{padding:12px 13px;border-top:1px solid #e8edf3;background:#fff;min-width:0}
+.ft-price-currency-body .ft-product-detail-price-wrap{margin:0}
+.ft-price-matrix-scroll{overflow-x:auto;max-width:100%}
+.ft-price-empty-state{margin:0;padding:14px 12px;background:#f7f9fc;border:1px dashed #dce4ee;border-radius:7px;color:#667085;font-size:12px}
+.ft-price-currency-actions,.ft-price-supplier-toolbar{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-start;margin-top:11px}
+.ft-price-supplier-toolbar{margin:2px 0 0}
+.ft-price-additional-heading{font-size:12px;font-weight:750;color:#344054;margin:16px 0 8px}
+.ft-price-editor{padding:15px;margin:0;border:1px solid #cad9e8;border-radius:8px;background:#fff}
+@media(max-width:600px){.ft-price-supplier-heading,.ft-price-currency-heading{padding:11px 12px;align-items:flex-start}.ft-price-supplier-meta{flex-wrap:wrap;justify-content:flex-end}.ft-price-supplier-body{padding:10px}.ft-price-currency-meta{white-space:nowrap}.ft-price-badge{font-size:10px;padding:3px 6px}}
+
+#portalView.supplier-product-module-page .ft-supplier-currency-add.ft-price-currency > summary {width:auto;max-width:none;list-style:none;}
+
+/* FlowTracker Product Detail / Edit parity: leave the existing Supplier Portal shell alone. */
+#portalView.supplier-product-module-page .ft-native-product-action-menu{position:relative;z-index:9;align-self:center}
+#portalView.supplier-product-module-page .ft-native-product-action-menu>summary{list-style:none;cursor:pointer}
+#portalView.supplier-product-module-page .ft-native-product-action-menu>summary::-webkit-details-marker{display:none}
+#portalView.supplier-product-module-page .ft-native-product-action-items{position:absolute;right:0;top:calc(100% + 6px);min-width:148px;background:#fff;border:1px solid #dbe3ec;box-shadow:0 8px 24px #12243b1a;border-radius:7px;padding:6px;z-index:15}
+#portalView.supplier-product-module-page .ft-native-product-action-items a,
+#portalView.supplier-product-module-page .ft-native-product-action-items button{display:block;width:100%;border:0;background:transparent;text-align:left;color:#25364d;padding:8px 10px;font-size:12px;font-weight:600;white-space:nowrap;border-radius:4px;cursor:pointer}
+#portalView.supplier-product-module-page .ft-native-product-action-items a:hover,
+#portalView.supplier-product-module-page .ft-native-product-action-items button:hover{background:#f4f7fa;text-decoration:none}
+#portalView.supplier-product-module-page .ft-native-product-action-items form{margin:0}
+#portalView.supplier-product-module-page .ft-native-product-action-items button[type=submit]{color:#b4232c}
+#portalView.supplier-product-module-page .ft-native-product-activity{position:relative;margin-left:auto}
+#portalView.supplier-product-module-page .ft-native-product-activity>summary{cursor:pointer;list-style:none;color:var(--ft-product-accent);font-weight:700}
+#portalView.supplier-product-module-page .ft-native-product-activity>summary::-webkit-details-marker{display:none}
+#portalView.supplier-product-module-page .ft-native-product-activity .ft-product-activity-popover{display:flex;position:absolute;top:calc(100% + 7px);right:0;z-index:12;min-width:260px;background:#fff;border:1px solid #dbe3ec;border-radius:8px;padding:13px;box-shadow:0 8px 22px #14243b18;flex-direction:column;gap:6px}
+#portalView.supplier-product-module-page .ft-native-supplier-edit-card{border:1px solid #d8e0ea;padding:14px;margin:14px 0;border-radius:7px;background:#fff}
+#portalView.supplier-product-module-page .ft-native-supplier-edit-card>strong{display:block;color:#1b2b43;margin-bottom:10px}
+#portalView.supplier-product-module-page .ft-product-price-section-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px}
+#portalView.supplier-product-module-page .ft-product-price-section-header strong{color:#17263c;font-weight:750;font-size:13px}
+#portalView.supplier-product-module-page .ft-product-client-price-list{margin-top:18px}
+#portalView.supplier-product-module-page .ft-product-client-price-list>small,
+#portalView.supplier-product-module-page .ft-product-supplier-price-list>small{display:block;font-size:11px;line-height:1.6;margin:2px 0 12px;color:#667085}
+#portalView.supplier-product-module-page .ft-native-supplier-edit-card .ft-native-matrix-wrap{margin:12px 0}
+#portalView.supplier-product-module-page .ft-native-image-input{display:block;margin-top:10px}
+#portalView.supplier-product-module-page .ft-native-image-input input[type=file]{max-width:100%;font-size:11px;min-height:34px;padding:6px}
+#portalView.supplier-product-module-page [data-native-image-drop]{cursor:pointer}
+#portalView.supplier-product-module-page [data-native-image-drop].is-dragging{border-color:var(--ft-product-accent);background:#ecfaf6}
+#portalView.supplier-product-module-page .ft-product-detail-image-panel{min-width:0}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-linked-suppliers{margin-top:12px}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-product-default-supplier{margin-top:14px}
+@media(max-width:760px){
+ #portalView.supplier-product-module-page .ft-native-product-action-items{right:0}
+ #portalView.supplier-product-module-page .ft-native-product-activity .ft-product-activity-popover{right:0;max-width:calc(100vw - 40px)}
+}
+#portalView.supplier-product-module-page .ft-native-availability-client-list[hidden]{display:none!important}
+#portalView.supplier-product-module-page .ft-product-client-scope .ft-native-availability-client-list{max-width:420px;margin:10px 0}
+#portalView.supplier-product-module-page .ft-product-client-scope .ft-product-page-btn{margin-top:8px}
+#portalView.supplier-product-module-page .ft-product-client-scope input[type=radio]{width:14px;height:14px;min-height:0;flex:0 0 14px;padding:0;margin:0 5px 0 0;accent-color:var(--ft-product-accent)}
+#portalView.supplier-product-module-page .ft-product-client-scope .ft-product-radio-row label{display:inline-flex;align-items:center;gap:4px;font-size:12px}
+
+
+/* Restore the exact FlowTracker Product form grid. The parity stylesheet
+   includes field styles but omitted these layout rules. Scope to this module. */
+#portalView.supplier-product-module-page .ft-product-form-page .ft-form-grid {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+#portalView.supplier-product-module-page .ft-product-form-page .ft-form-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+    #portalView.supplier-product-module-page .ft-product-form-page .ft-form-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 760px) {
+    #portalView.supplier-product-module-page .ft-product-form-page .ft-form-grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Product Edit: shipment and supporting document actions (scoped to this page only). */
+#portalView.supplier-product-module-page .ft-ux-section-intro,
+#portalView.supplier-product-module-page .ft-ux-subsection-heading {
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+}
+#portalView.supplier-product-module-page .ft-ux-section-intro {margin-bottom:18px;}
+#portalView.supplier-product-module-page .ft-ux-section-intro h3,
+#portalView.supplier-product-module-page .ft-ux-subsection-heading h3 {margin:0 0 5px;font-size:14px;line-height:1.4;color:#203047;font-weight:750;}
+#portalView.supplier-product-module-page .ft-ux-section-intro p,
+#portalView.supplier-product-module-page .ft-ux-subsection-heading p {margin:0;color:#67788d;font-size:12px;line-height:1.5;}
+#portalView.supplier-product-module-page .ft-ux-readonly-pill,
+#portalView.supplier-product-module-page .ft-ux-counter {display:inline-flex;align-items:center;white-space:nowrap;min-height:26px;border-radius:6px;padding:4px 10px;border:1px solid #dce5ee;background:#f6f8fb;font-size:11px;color:#52647d;font-weight:700;}
+#portalView.supplier-product-module-page .ft-ux-subsection {padding:17px;border:1px solid #e0e7ef;border-radius:9px;background:#fff;margin:0 0 14px;}
+#portalView.supplier-product-module-page .ft-ux-subsection-heading {margin-bottom:14px;}
+#portalView.supplier-product-module-page .ft-ux-empty-panel {display:flex;align-items:center;gap:13px;padding:15px 16px;border:1px dashed #d5deea;border-radius:9px;background:#f8fafc;margin-bottom:12px;min-height:74px;}
+#portalView.supplier-product-module-page .ft-ux-empty-icon {width:38px;height:38px;flex:0 0 38px;border-radius:9px;display:grid;place-items:center;color:#14877a;background:#e7f5f0;font-size:20px;font-weight:650;}
+#portalView.supplier-product-module-page .ft-ux-empty-panel strong {display:block;color:#263a51;font-size:13px;font-weight:740;}
+#portalView.supplier-product-module-page .ft-ux-empty-panel small {display:block;color:#67788d;font-size:11px;line-height:1.5;margin-top:4px;}
+#portalView.supplier-product-module-page .ft-ux-urgency-list {display:grid;gap:10px;}
+#portalView.supplier-product-module-page .ft-ux-urgency-row {display:grid;grid-template-columns:minmax(0,2fr) minmax(120px,1fr) auto;gap:12px;align-items:end;border:1px solid #e2e9f1;border-radius:8px;padding:12px;margin:0;background:#fbfcfe;}
+#portalView.supplier-product-module-page .ft-ux-urgency-row label {display:flex;flex-direction:column;gap:5px;min-width:0;}
+#portalView.supplier-product-module-page .ft-ux-urgency-row label>span {display:block;font-size:11px;font-weight:700;color:#51627a;margin:0;}
+#portalView.supplier-product-module-page .ft-ux-urgency-row select,
+#portalView.supplier-product-module-page .ft-ux-urgency-row input {min-width:0;width:100%;height:37px;min-height:37px;border-radius:6px;}
+#portalView.supplier-product-module-page .ft-ux-row-remove {border:1px solid #e9d0d0;border-radius:6px;color:#a33b3b;background:#fff;height:37px;padding:0 12px;font-weight:700;font-size:11px;cursor:pointer;}
+#portalView.supplier-product-module-page .ft-ux-row-remove:hover {background:#fff6f6;}
+#portalView.supplier-product-module-page .ft-ux-add-urgency {margin-top:12px;}
+#portalView.supplier-product-module-page .ft-ux-muted-note {display:block;margin:8px 0;color:#667085;font-size:11px;}
+#portalView.supplier-product-module-page .ft-ux-urgency-summary {display:grid;gap:7px;}
+#portalView.supplier-product-module-page .ft-ux-urgency-summary-row {display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 13px;border:1px solid #e5ebf2;border-radius:7px;font-size:12px;color:#50627b;}
+#portalView.supplier-product-module-page .ft-ux-urgency-summary-row strong {color:#233750;}
+#portalView.supplier-product-module-page .ft-ux-section-actions {display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:14px 2px 0;border-top:1px solid #e4eaf2;}
+#portalView.supplier-product-module-page .ft-ux-section-actions small {margin-right:auto;color:#667085;font-size:11px;line-height:1.5;}
+#portalView.supplier-product-module-page .ft-ux-permission-note {margin:12px 0 0;padding:11px 13px;color:#5b6a80;border-radius:7px;background:#f4f7fb;border:1px solid #e2e9f2;font-size:11px;line-height:1.5;}
+#portalView.supplier-product-module-page .ft-ux-documents-intro {margin:0 0 14px;align-items:center;}
+#portalView.supplier-product-module-page .ft-ux-documents-intro p {max-width:700px;}
+#portalView.supplier-product-module-page .ft-ux-documents-grid {display:grid;grid-template-columns:minmax(160px,.55fr) repeat(2,minmax(0,1fr));align-items:stretch;gap:14px;}
+#portalView.supplier-product-module-page .ft-ux-certificate-reference {display:flex;flex-direction:column;gap:9px;min-width:0;padding:13px 3px 10px 0;}
+#portalView.supplier-product-module-page .ft-ux-doc-label {font-size:12px;font-weight:750;color:#33475f;}
+#portalView.supplier-product-module-page .ft-ux-doc-label em {font-style:normal;font-size:10px;font-weight:600;color:#718098;padding:3px 5px;background:#f3f5f9;border-radius:4px;}
+#portalView.supplier-product-module-page .ft-ux-certificate-reference .ft-product-locked-field {min-height:42px;display:flex;align-items:center;padding:9px 11px;color:#33455e;}
+#portalView.supplier-product-module-page .ft-ux-certificate-reference small {font-size:11px;color:#6c7b92;line-height:1.5;}
+#portalView.supplier-product-module-page .ft-ux-document-card {border:1px solid #dce5ee;border-radius:10px;background:#fff;padding:15px;min-width:0;display:flex;flex-direction:column;gap:13px;}
+#portalView.supplier-product-module-page .ft-ux-document-card-heading {display:flex;align-items:center;gap:10px;min-width:0;}
+#portalView.supplier-product-module-page .ft-ux-document-icon {background:#edf6f5;border-radius:8px;color:#068577;width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;}
+#portalView.supplier-product-module-page .ft-ux-document-card-heading strong,
+#portalView.supplier-product-module-page .ft-ux-document-card-heading small {display:block;}
+#portalView.supplier-product-module-page .ft-ux-document-card-heading strong {font-size:12px;line-height:1.35;color:#1f324c;}
+#portalView.supplier-product-module-page .ft-ux-document-card-heading small {font-size:10px;line-height:1.4;color:#6c7b91;margin-top:4px;}
+#portalView.supplier-product-module-page .ft-ux-document-current {display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 11px;background:#f7fafc;border:1px solid #e7edf3;border-radius:7px;min-height:47px;}
+#portalView.supplier-product-module-page .ft-ux-document-current.is-empty {color:#8894a5;font-size:12px;}
+#portalView.supplier-product-module-page .ft-ux-document-filename {min-width:0;overflow:hidden;}
+#portalView.supplier-product-module-page .ft-ux-document-filename strong {font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block;color:#273850;}
+#portalView.supplier-product-module-page .ft-ux-document-filename small {font-size:10px;color:#718096;}
+#portalView.supplier-product-module-page .ft-ux-document-view {height:32px;padding:0 11px;flex-shrink:0;}
+#portalView.supplier-product-module-page .ft-ux-document-upload {display:grid;gap:11px;margin-top:auto;}
+#portalView.supplier-product-module-page .ft-ux-file-picker {display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;min-height:90px;border:1px dashed #b9ccd8;background:#f9fcfd;border-radius:8px;padding:12px;cursor:pointer;text-align:center;color:#42566e;}
+#portalView.supplier-product-module-page .ft-ux-file-picker:hover,
+#portalView.supplier-product-module-page .ft-ux-file-picker:focus-within,
+#portalView.supplier-product-module-page .ft-ux-file-picker.is-dragging {background:#edf8f5;border-color:#008779;}
+#portalView.supplier-product-module-page .ft-ux-file-picker input[type=file] {position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%);padding:0;border:0;}
+#portalView.supplier-product-module-page .ft-ux-file-picker-main {font-size:11px;color:#617189;}
+#portalView.supplier-product-module-page .ft-ux-file-picker-main strong {color:#007c71;font-weight:750;}
+#portalView.supplier-product-module-page .ft-ux-file-picker>small {display:block;max-width:100%;font-size:10px;color:#67788b;overflow-wrap:anywhere;line-height:1.4;}
+#portalView.supplier-product-module-page .ft-ux-file-picker.is-invalid>small {color:#b42318;}
+#portalView.supplier-product-module-page .ft-ux-document-actions {display:flex;justify-content:space-between;align-items:center;gap:10px;}
+#portalView.supplier-product-module-page .ft-ux-document-actions>small {font-size:10px;color:#718096;line-height:1.5;}
+#portalView.supplier-product-module-page .ft-ux-document-actions button {flex-shrink:0;}
+#portalView.supplier-product-module-page .ft-ux-document-actions button:disabled {opacity:.55;cursor:not-allowed;}
+#portalView.supplier-product-module-page .ft-ux-product-form-footer {display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 20px;border-top:1px solid #d9e2ec;}
+#portalView.supplier-product-module-page .ft-ux-product-form-footer>small {max-width:650px;font-size:11px;line-height:1.5;color:#708099;}
+#portalView.supplier-product-module-page .ft-ux-footer-buttons {display:flex;align-items:center;gap:9px;margin-left:auto;}
+#portalView.supplier-product-module-page .ft-ux-image-upload-actions {display:flex;flex-direction:column;align-items:stretch;gap:9px;margin-top:12px;}
+#portalView.supplier-product-module-page .ft-ux-image-upload-actions .ft-native-image-input {gap:7px;}
+#portalView.supplier-product-module-page .ft-ux-image-upload-actions input[type=file] {font-size:11px;width:100%;max-width:100%;border:1px solid #d4dee9;border-radius:7px;background:#f8fafc;padding:7px;min-height:44px;}
+#portalView.supplier-product-module-page .ft-ux-image-upload-actions input[type=file]::file-selector-button {padding:7px 10px;margin-right:9px;border:1px solid #c5d4e2;border-radius:5px;background:#fff;color:#285466;font-size:11px;font-weight:700;cursor:pointer;}
+#portalView.supplier-product-module-page .ft-ux-image-upload-actions button {width:100%;}
+@media (max-width:1100px) {
+    #portalView.supplier-product-module-page .ft-ux-documents-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+    #portalView.supplier-product-module-page .ft-ux-certificate-reference {grid-column:1/-1;}
+}
+@media (max-width:720px) {
+    #portalView.supplier-product-module-page .ft-ux-documents-grid {grid-template-columns:1fr;}
+    #portalView.supplier-product-module-page .ft-ux-certificate-reference {grid-column:auto;}
+    #portalView.supplier-product-module-page .ft-ux-urgency-row {grid-template-columns:1fr;}
+    #portalView.supplier-product-module-page .ft-ux-section-intro,
+    #portalView.supplier-product-module-page .ft-ux-subsection-heading {flex-wrap:wrap;}
+    #portalView.supplier-product-module-page .ft-ux-section-actions,
+    #portalView.supplier-product-module-page .ft-ux-document-actions,
+    #portalView.supplier-product-module-page .ft-ux-product-form-footer {flex-direction:column;align-items:stretch;}
+    #portalView.supplier-product-module-page .ft-ux-section-actions button,
+    #portalView.supplier-product-module-page .ft-ux-document-actions button,
+    #portalView.supplier-product-module-page .ft-ux-footer-buttons {width:100%;}
+    #portalView.supplier-product-module-page .ft-ux-footer-buttons > * {flex:1;}
+}

@@ -68,6 +68,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Revoke delegated FlowTracker Product sessions when a supplier signs out.
+        try {
+            if ($request->user()) app(\App\Services\FlowtrackProductModuleBridge::class)->revoke($request->user());
+        } catch (\Throwable $exception) { report($exception); }
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

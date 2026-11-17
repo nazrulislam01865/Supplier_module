@@ -2,8 +2,9 @@
     // The same sidebar is used by the SPA workspace and standalone order details.
     $isOrderDetail = $isOrderDetail ?? false;
     $isProductPrices = $isProductPrices ?? request()->routeIs('supplier.products.prices*');
+    $isProductModule = $isProductModule ?? request()->routeIs('supplier.products.module');
     $isPurchaseOrders = $isPurchaseOrders ?? request()->routeIs('supplier.purchase-orders.*');
-    $isStandalone = $isOrderDetail || $isProductPrices || $isPurchaseOrders;
+    $isStandalone = $isOrderDetail || $isProductPrices || $isPurchaseOrders || $isProductModule;
     $initialView = $initialView ?? 'dashboard';
     $unreadCount = $isStandalone ? ($sidebarCounts['unread'] ?? 0) : ($dashboard['unreadNotifications'] ?? 0);
 @endphp
@@ -40,6 +41,24 @@
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h4M10 13h6M10 17h6"/><path d="M5 8H3v13h12"/></svg>
             Purchase Orders
         </a>
+        <div class="supplier-product-nav-group" aria-label="Product">
+            <div class="nav-section-label" style="margin-top:12px">Product</div>
+            @foreach([
+                ['product', false, 'Products'],
+                ['product', true, 'Create Product'],
+                ['product_category', false, 'Product Categories'],
+                ['product_category', true, 'Create Product Category'],
+            ] as [$productGroup, $productCreate, $productLabel])
+                <a class="nav-item {{ $isProductModule && ($group ?? request()->query('group', 'product')) === $productGroup && ($create ?? request()->query('create') === '1') == $productCreate ? 'active' : '' }}"
+                    href="{{ route('supplier.products.module', ['group' => $productGroup] + ($productCreate ? ['create' => '1'] : [])) }}"
+                    @if($isProductModule && ($group ?? request()->query('group', 'product')) === $productGroup && ($create ?? request()->query('create') === '1') == $productCreate) aria-current="page" @endif>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        @if($productCreate)<circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/>@else<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 10h8M8 14h8"/>@endif
+                    </svg>
+                    {{ $productLabel }}
+                </a>
+            @endforeach
+        </div>
         <a class="nav-item {{ $isProductPrices ? 'active' : '' }}" href="{{ route('supplier.products.prices') }}" @if($isProductPrices)aria-current="page"@endif>
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
             Products &amp; Prices

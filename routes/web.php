@@ -34,6 +34,13 @@ Route::middleware(['auth',EnforceSupplierSessionTimeout::class,EnsureSupplierAct
         ->middleware('throttle:30,1')->name('supplier.dashboard.notifications.center');
     Route::post('/dashboard/notifications/read', [PortalController::class, 'markNotificationsRead'])
         ->middleware('throttle:20,1')->name('supplier.dashboard.notifications.read');
+    Route::post('/products/module/action', [\App\Http\Controllers\SupplierProductModuleController::class, 'action'])
+        ->middleware('throttle:30,1')->name('supplier.products.module.action');
+    Route::get('/products/module/asset/{product}/{kind}', [\App\Http\Controllers\SupplierProductModuleController::class, 'asset'])
+        ->whereNumber('product')->whereIn('kind', ['image', 'option_image', 'certificate', 'template'])
+        ->middleware('throttle:60,1')->name('supplier.products.module.asset');
+    Route::get('/products/module', \App\Http\Controllers\SupplierProductModuleController::class)
+        ->middleware('throttle:supplier-product-read')->name('supplier.products.module');
     Route::get('/products/prices', [\App\Http\Controllers\SupplierProductPriceController::class, 'index'])->name('supplier.products.prices');
     Route::get('/products/prices/realtime-revision', [\App\Http\Controllers\SupplierCatalogRealtimeController::class, 'revision'])
         ->middleware('throttle:15,1')->name('supplier.products.prices.realtime.revision');

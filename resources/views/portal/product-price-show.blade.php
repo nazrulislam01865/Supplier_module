@@ -58,8 +58,13 @@
             @endif
             <div class="pricing-detail-grid">
                 <section class="pricing-editor-card pricing-detail-prices">
-                    <header class="pricing-editor-card-header"><h2>Current Supplier Price Tiers</h2><p>Supplier-specific prices approved in FlowTracker (USD).</p></header>
-                    @include('portal.partials.pricing-supplier-tier-table', ['tiers' => $tiers])
+                    <header class="pricing-editor-card-header"><h2>Supplier-based pricing</h2><p>Approved quantity-based prices and optional shipping charges.</p></header>
+                    @include('portal.partials.pricing-product-detail-matrix', [
+                        'tiers' => $tiers,
+                        'charges' => $payload['supplier_charges'] ?? [],
+                        'currency' => $payload['supplier_price_currency'] ?? 'USD',
+                        'supplierName' => $company->name,
+                    ])
                 </section>
                 <section class="pricing-editor-card pricing-detail-request">
                     <header class="pricing-editor-card-header"><h2>Latest Price Request</h2></header>

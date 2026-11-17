@@ -34,7 +34,19 @@ class SupplierSecurityHeaders
             && (! isset($buyer['port']) || ($buyer['port'] > 0 && $buyer['port'] <= 65535))) {
             $imageSrc .= ' '.$buyer['scheme'].'://'.$buyer['host'].(isset($buyer['port']) ? ':'.$buyer['port'] : '');
         }
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; img-src {$imageSrc}; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src {$connectSrc}");
+        $frameSrc = "'none'";
+        if ($request->routeIs('supplier.products.module')) {
+            $origin = rtrim((string) config('flowtrack_bridge.product_module_url'), '/');
+            $parts = parse_url($origin);
+            if (is_array($parts) && in_array($parts['scheme'] ?? '', ['https', 'http'], true)
+                && preg_match('/^[a-zA-Z0-9.-]+$/', (string) ($parts['host'] ?? ''))
+                && (! isset($parts['port']) || (int) $parts['port'] > 0 && (int) $parts['port'] <= 65535)
+                && ($parts['scheme'] === 'https' || (app()->environment(['local', 'testing'])
+                    && in_array($parts['host'], ['localhost', '127.0.0.1'], true)))) {
+                $frameSrc = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
+            }
+        }
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src {$frameSrc}; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; img-src {$imageSrc}; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src {$connectSrc}");
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }

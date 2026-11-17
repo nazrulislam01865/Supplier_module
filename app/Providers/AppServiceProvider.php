@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('supplier-inquiry-task-file', static fn (Request $request): Limit =>
             Limit::perMinute(60)->by('rfq-task-file:' . (int) $request->user()?->id . ':' . (int) $request->route('id')));
 
+        // Category/page/filter navigation can exceed 12 GETs during normal use.
+        // Keep a per-user read limit; mutation endpoints retain their own stricter limit.
+        RateLimiter::for('supplier-product-read', static fn (Request $request): Limit =>
+            Limit::perMinute(45)->by('product-read:user:' . (int) $request->user()?->id));
+
         View::composer('portal.partials.sidebar', static function (BladeView $view): void {
             // Workspace pages already provide their counts; standalone pages
             // cannot rely on $quotations, $orderPage or $dashboard being present.
@@ -32,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
             $standalone = ($data['isOrderDetail'] ?? false)
                 || ($data['isProductPrices'] ?? false)
                 || ($data['isPurchaseOrders'] ?? false)
-                || request()->routeIs('supplier.orders.show', 'supplier.products.prices*', 'supplier.purchase-orders.*');
+                || ($data['isProductModule'] ?? false)
+                || request()->routeIs('supplier.orders.show', 'supplier.products.prices*', 'supplier.products.module', 'supplier.purchase-orders.*');
             if (! $standalone || ! auth()->check()) {
                 return;
             }

@@ -1451,3 +1451,16 @@ body.pricing-dialog-open {
         backdrop-filter: none
     }
 }
+/* FlowTracker Product Detail quantity-first price matrix, view-only. */
+.pricing-ft-matrix-wrap{border:1px solid #dce3ed;border-radius:9px;overflow:hidden;background:#fff;margin-top:8px}
+.pricing-ft-matrix-name{display:block;padding:12px 15px;font-size:14px;color:#1f304b;}
+.pricing-ft-matrix-scroll{overflow-x:auto;max-width:100%}
+.pricing-ft-matrix{min-width:100%;width:max-content;border-collapse:collapse;font-size:12px;color:#26354e}
+.pricing-ft-matrix th,.pricing-ft-matrix td{min-width:110px;padding:12px 15px;border-right:1px solid #e7ebf0;border-bottom:1px solid #e7ebf0;white-space:nowrap;text-align:center}
+.pricing-ft-matrix th:first-child{position:sticky;left:0;min-width:170px;text-align:left;background:#fff;z-index:1}
+.pricing-ft-matrix thead th{background:#f4f7fa;color:#526179;font-weight:700}
+.pricing-ft-matrix thead th:first-child{background:#f4f7fa}
+.pricing-ft-matrix tbody th{font-weight:700;color:#33425b}
+.pricing-ft-matrix tbody td{font-weight:650}
+.pricing-ft-matrix tr:last-child th,.pricing-ft-matrix tr:last-child td{border-bottom:0}
+.pricing-ft-matrix tr th:last-child,.pricing-ft-matrix tr td:last-child{border-right:0}
